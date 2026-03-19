@@ -3,3 +3,4 @@
 -- Add any additional keymaps here
 
 vim.keymap.set("n", "<Esc>", "<cmd>noh<cr>", { desc = "Clear highlights" })
+vim.keymap.set("i", "<M-k>", vim.lsp.buf.signature_help, { desc = "Signature Help" })
