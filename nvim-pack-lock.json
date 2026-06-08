@@ -1,5 +1,9 @@
 {
   "plugins": {
+    "avante.nvim": {
+      "rev": "e7a167e5bf7de92d406e371d500c803603ec642f",
+      "src": "https://github.com/yetone/avante.nvim"
+    },
     "blink.cmp": {
       "rev": "bae4bae0eedd1fa55f34b685862e94a222d5c6f8",
       "src": "https://github.com/saghen/blink.cmp",
@@ -12,6 +16,10 @@
     "conform.nvim": {
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
       "src": "https://github.com/stevearc/conform.nvim"
+    },
+    "copilot.lua": {
+      "rev": "0415bd625c3076a6a5ee445be484574d55b4fbfc",
+      "src": "https://github.com/zbirenbaum/copilot.lua"
     },
     "gitsigns.nvim": {
       "rev": "25050e4ed39e628282831d4cbecb1850454ce915",
