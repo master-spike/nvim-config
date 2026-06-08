@@ -10,3 +10,6 @@ require("neo-tree").setup({
     },
   },
 })
+
+-- Toggle the file explorer; when opening, jump to the current buffer's file.
+vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle reveal<cr>", { desc = "Explorer (reveal current file)" })
