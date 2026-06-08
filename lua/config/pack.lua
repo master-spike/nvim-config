@@ -13,6 +13,7 @@ vim.pack.add({
 
   -- Treesitter (master branch = classic setup API, stable on 0.12)
   { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "master" },
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "master" },
 
   -- Fuzzy finder
   { src = "https://github.com/nvim-telescope/telescope.nvim" },
