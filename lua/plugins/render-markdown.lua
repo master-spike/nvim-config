@@ -4,7 +4,7 @@ return {
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
     opts = {
       -- Enable rendering in these file types
-      file_types = { "markdown", "Avante" },
+      file_types = { "markdown", "Avante", "octo" },
 
       -- Heading icons and highlights
       heading = {
