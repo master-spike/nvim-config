@@ -44,3 +44,19 @@ end, { desc = "Next diagnostic" })
 map("n", "[d", function()
   vim.diagnostic.jump({ count = -1 })
 end, { desc = "Prev diagnostic" })
+
+-- Telescope git hunks
+map("n", "<leader>fg", function()
+  vim.api.nvim_create_autocmd("BufReadPost", {
+    pattern = "*",
+    once = true,
+    callback = function()
+      -- Ensure it's a quickfix window before launching Telescope
+      if vim.bo.buftype == "quickfix" then
+        -- Close the physical quickfix window so only Telescope stays open
+        require("telescope.builtin").quickfix()
+      end
+    end,
+  })
+  require("gitsigns").setqflist({ target = "all" })
+end)
