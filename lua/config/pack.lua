@@ -39,6 +39,7 @@ vim.pack.add({
   { src = "https://github.com/folke/trouble.nvim" },
   { src = "https://github.com/folke/which-key.nvim" },
   { src = "https://github.com/folke/snacks.nvim" },
+  { src = "https://github.com/folke/flash.nvim" },
 
   -- Neo-tree
   {
@@ -82,6 +83,7 @@ local modules = {
   "trouble",
   "whichkey",
   "snacks",
+  "flash",
   "render-markdown",
   "octo",
   "jdtls",

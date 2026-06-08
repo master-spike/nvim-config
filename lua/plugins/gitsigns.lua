@@ -76,7 +76,7 @@ require("gitsigns").setup({
 -- preview matches the hunks gitsigns actually computed.
 local function hunk_diff_lines(filename, lnum)
   local dir = vim.fn.fnamemodify(filename, ":h")
-  local args = { "git", "-C", dir, "--no-pager", "-c", "color.ui=never", "diff", "-U3" }
+  local args = { "git", "-C", dir, "--no-pager", "-c", "color.ui=never", "diff", "-U0" }
   local base = require("gitsigns.config").config.base
   if base and base ~= ":0" then
     args[#args + 1] = base
