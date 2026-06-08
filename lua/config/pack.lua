@@ -5,6 +5,7 @@ vim.pack.add({
   -- Library / icons
   { src = "https://github.com/nvim-lua/plenary.nvim" },
   { src = "https://github.com/nvim-tree/nvim-web-devicons" },
+  { src = "https://github.com/MunifTanjim/nui.nvim" },
 
   -- Colorschemes
   { src = "https://github.com/ellisonleao/gruvbox.nvim" },
@@ -38,6 +39,11 @@ vim.pack.add({
   { src = "https://github.com/folke/which-key.nvim" },
   { src = "https://github.com/folke/snacks.nvim" },
 
+  -- Neo-tree
+  {
+    src = "https://github.com/nvim-neo-tree/neo-tree.nvim",
+    version = vim.version.range("3"),
+  },
   -- Filetype / integrations
   { src = "https://github.com/mfussenegger/nvim-jdtls" },
   { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
@@ -75,6 +81,7 @@ local modules = {
   "jdtls",
   "tmux-navigator",
   "minesweeper",
+  "neo-tree",
 }
 
 for _, m in ipairs(modules) do
