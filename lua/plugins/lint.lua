@@ -1,11 +1,9 @@
--- Linting via nvim-lint (eslint extra)
+-- Linting via nvim-lint (non-LSP linters only).
+-- JS/TS linting is handled by the eslint LSP (see config/lsp.lua), matching the
+-- previous LazyVim eslint extra (diagnostics + fix-on-save via LspEslintFixAll).
 local lint = require("lint")
 
 lint.linters_by_ft = {
-  javascript = { "eslint_d" },
-  typescript = { "eslint_d" },
-  javascriptreact = { "eslint_d" },
-  typescriptreact = { "eslint_d" },
   sh = { "shellcheck" },
 }
 

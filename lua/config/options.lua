@@ -50,6 +50,9 @@ vim.g.snacks_animate = false
 opt.spell = false
 opt.smoothscroll = false
 
+-- Yank to / paste from the system clipboard by default
+opt.clipboard = "unnamedplus"
+
 -- Use ripgrep when available
 if vim.fn.executable("rg") == 1 then
   opt.grepprg = "rg --vimgrep"

@@ -117,6 +117,21 @@ vim.lsp.config("lua_ls", {
   },
 })
 
+-- eslint LSP: TS/JS diagnostics + fix-on-save (replaces nvim-lint eslint_d,
+-- matches the previous LazyVim eslint extra behaviour).
+local base_eslint_on_attach = vim.lsp.config.eslint and vim.lsp.config.eslint.on_attach
+vim.lsp.config("eslint", {
+  on_attach = function(client, bufnr)
+    if base_eslint_on_attach then
+      base_eslint_on_attach(client, bufnr)
+    end
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = bufnr,
+      command = "LspEslintFixAll",
+    })
+  end,
+})
+
 -- Enable servers (binaries installed via Mason).
 vim.lsp.enable({
   "lua_ls",
@@ -128,6 +143,7 @@ vim.lsp.enable({
   "neocmake",
   "dockerls",
   "docker_compose_language_service",
+  "eslint",
   "kotlin_language_server",
   "marksman",
   "terraformls",
