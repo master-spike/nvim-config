@@ -53,9 +53,9 @@ vim.pack.add({
   { src = "https://github.com/master-spike/minesweeper-nvim" },
 
   -- AI
-  { src = "https://github.com/MunifTanjim/nui.nvim" },
-  { src = "https://github.com/zbirenbaum/copilot.lua" },
-  { src = "https://github.com/yetone/avante.nvim" },
+  { src = "https://github.com/nvim-lua/plenary.nvim" },
+  { src = "https://github.com/j-hui/fidget.nvim" },
+  { src = "https://github.com/olimorris/codecompanion.nvim" },
 })
 
 -- Build step for telescope-fzf-native (compiles a C library).
@@ -63,19 +63,6 @@ local fzf_dir = vim.fn.stdpath("data") .. "/site/pack/core/opt/telescope-fzf-nat
 if vim.fn.isdirectory(fzf_dir) == 1 and vim.fn.filereadable(fzf_dir .. "/build/libfzf.so") == 0 then
   if vim.fn.executable("make") == 1 then
     vim.fn.system({ "make", "-C", fzf_dir })
-  end
-end
-
--- Build step for avante.nvim. The default `make` target runs build.sh, which
--- downloads the prebuilt native libraries from the matching GitHub release into
--- avante's lua/ dir (named *.so even on macOS, since LuaJIT loads .so via cpath).
--- Building from source is avoided: cargo emits .dylib on macOS while the loader
--- expects .so. Requires an authenticated `gh` CLI to fetch the release asset.
-local avante_dir = vim.fn.stdpath("data") .. "/site/pack/core/opt/avante.nvim"
-if vim.fn.isdirectory(avante_dir) == 1 and vim.fn.filereadable(avante_dir .. "/lua/avante_tokenizers.so") == 0 then
-  if vim.fn.executable("make") == 1 then
-    vim.notify("Building avante.nvim (downloading native libs)...", vim.log.levels.INFO)
-    vim.fn.system({ "make", "-C", avante_dir })
   end
 end
 
@@ -100,8 +87,8 @@ local modules = {
   "jdtls",
   "tmux-navigator",
   "minesweeper",
-  "copilot",
-  "avante",
+  "fidget",
+  "codecompanion",
   "neo-tree",
 }
 
