@@ -33,6 +33,8 @@ vim.pack.add({
   { src = "https://github.com/echasnovski/mini.nvim" },
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
   { src = "https://github.com/nvim-lualine/lualine.nvim" },
+  { src = "https://github.com/akinsho/bufferline.nvim" },
+  { src = "https://github.com/folke/trouble.nvim" },
   { src = "https://github.com/folke/which-key.nvim" },
   { src = "https://github.com/folke/snacks.nvim" },
 
@@ -64,6 +66,8 @@ local modules = {
   "mini",
   "gitsigns",
   "lualine",
+  "bufferline",
+  "trouble",
   "whichkey",
   "snacks",
   "render-markdown",
