@@ -37,6 +37,7 @@ vim.pack.add({
   { src = "https://github.com/folke/snacks.nvim" },
 
   -- Filetype / integrations
+  { src = "https://github.com/mfussenegger/nvim-jdtls" },
   { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
   { src = "https://github.com/pwntester/octo.nvim" },
   { src = "https://github.com/christoomey/vim-tmux-navigator" },
@@ -67,6 +68,7 @@ local modules = {
   "snacks",
   "render-markdown",
   "octo",
+  "jdtls",
   "tmux-navigator",
   "minesweeper",
 }
