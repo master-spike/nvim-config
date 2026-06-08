@@ -1,2 +1,6 @@
--- bootstrap lazy.nvim, LazyVim and your plugins
-require("config.lazy")
+-- Neovim 0.12 native config: vim.pack + native LSP (no LazyVim / lazy.nvim)
+require("config.options")
+require("config.keymaps")
+require("config.autocmds")
+require("config.pack")
+require("config.lsp")

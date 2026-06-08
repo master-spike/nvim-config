@@ -1,6 +1,1 @@
-return { {
-  "master-spike/minesweeper-nvim",
-  config = function()
-    require("minesweeper").setup()
-  end,
-} }
+require("minesweeper").setup()
