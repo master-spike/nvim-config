@@ -1,6 +1,5 @@
 -- Plugin management via Neovim 0.12 builtin vim.pack.
 -- Plugins are cloned into stdpath('data')/site/pack/core/opt and added to rtp.
-
 vim.pack.add({
   -- Library / icons
   { src = "https://github.com/nvim-lua/plenary.nvim" },
@@ -57,7 +56,12 @@ vim.pack.add({
   { src = "https://github.com/nvim-lua/plenary.nvim" },
   { src = "https://github.com/j-hui/fidget.nvim" },
   { src = "https://github.com/olimorris/codecompanion.nvim" },
+  -- 99: managed locally (symlinked at pack/mine/opt/99 -> local dev repo),
+  -- so it is intentionally NOT listed here. It is loaded via :packadd below.
 })
+
+-- Load the local development copy of 99 from pack/mine/opt/99.
+vim.cmd.packadd("99")
 
 -- Build step for telescope-fzf-native (compiles a C library).
 local fzf_dir = vim.fn.stdpath("data") .. "/site/pack/core/opt/telescope-fzf-native.nvim"
@@ -69,6 +73,7 @@ end
 
 -- Load per-plugin setup modules (each does its own require().setup()).
 local modules = {
+  "99",
   "colorscheme",
   "treesitter",
   "telescope",
