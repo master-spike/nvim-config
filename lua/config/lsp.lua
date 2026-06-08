@@ -31,9 +31,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local function map(keys, fn, desc)
       vim.keymap.set("n", keys, fn, { buffer = buf, desc = "LSP: " .. desc })
     end
-    map("gd", vim.lsp.buf.definition, "Goto Definition")
-    map("gr", vim.lsp.buf.references, "References")
-    map("gI", vim.lsp.buf.implementation, "Goto Implementation")
+
+    -- Use Telescope pickers for LSP navigation so results open in the picker
+    -- (and <C-q> sends them to the quickfix list). Fall back to vim.lsp.buf.
+    local tb = require("telescope.builtin")
+    map("gd", tb.lsp_definitions, "Goto Definition")
+    map("gr", tb.lsp_references, "References")
+    map("gI", tb.lsp_implementations, "Goto Implementation")
+    map("gy", tb.lsp_type_definitions, "Goto Type Definition")
+
     map("gD", vim.lsp.buf.declaration, "Goto Declaration")
     map("K", vim.lsp.buf.hover, "Hover")
     map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
