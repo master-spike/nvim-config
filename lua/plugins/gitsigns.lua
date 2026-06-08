@@ -72,20 +72,17 @@ require("gitsigns").setup({
 -- pane shows the actual added/removed lines with diff highlighting.
 
 -- Return the unified-diff lines for the hunk in `filename` that covers `lnum`.
+-- Diffs against the same base gitsigns is configured with (config.base), so the
+-- preview matches the hunks gitsigns actually computed.
 local function hunk_diff_lines(filename, lnum)
   local dir = vim.fn.fnamemodify(filename, ":h")
-  local out = vim.fn.systemlist({
-    "git",
-    "-C",
-    dir,
-    "--no-pager",
-    "-c",
-    "color.ui=never",
-    "diff",
-    "-U3",
-    "--",
-    filename,
-  })
+  local args = { "git", "-C", dir, "--no-pager", "-c", "color.ui=never", "diff", "-U3" }
+  local base = require("gitsigns.config").config.base
+  if base and base ~= ":0" then
+    args[#args + 1] = base
+  end
+  vim.list_extend(args, { "--", filename })
+  local out = vim.fn.systemlist(args)
   if vim.v.shell_error ~= 0 or vim.tbl_isempty(out) then
     return { "(no diff available)" }
   end
