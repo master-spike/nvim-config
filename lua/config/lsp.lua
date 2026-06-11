@@ -42,7 +42,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- Use Telescope pickers for LSP navigation so results open in the picker
     -- (and <C-q> sends them to the quickfix list). Fall back to vim.lsp.buf.
     local tb = require("telescope.builtin")
-    map("gd", tb.lsp_definitions, "Goto Definition")
+    map("gd", require("util.lsp_definition").goto_definition, "Goto Definition")
     map("gr", tb.lsp_references, "References")
     map("gI", tb.lsp_implementations, "Goto Implementation")
     map("gy", tb.lsp_type_definitions, "Goto Type Definition")
