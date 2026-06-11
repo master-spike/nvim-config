@@ -6,6 +6,10 @@ local ai = require("mini.ai")
 --   ac/ic  class
 --   ao/io  block / conditional / loop
 --   aa/ia  argument / parameter
+-- Treesitter-backed text objects (queries from nvim-treesitter-textobjects):
+--   af/if  function (outer/inner)  -> daf, dif, yaf, cif, vaf, ...
+--   ac/ic  class
+--   ao/io  block / conditional / loop
 ai.setup({
   n_lines = 500,
   custom_textobjects = {

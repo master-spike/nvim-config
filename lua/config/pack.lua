@@ -56,12 +56,11 @@ vim.pack.add({
   { src = "https://github.com/nvim-lua/plenary.nvim" },
   { src = "https://github.com/j-hui/fidget.nvim" },
   { src = "https://github.com/olimorris/codecompanion.nvim" },
-  -- 99: managed locally (symlinked at pack/mine/opt/99 -> local dev repo),
-  -- so it is intentionally NOT listed here. It is loaded via :packadd below.
+  { src = "https://github.com/master-spike/99", version = "feature/copilot-provider" },
 })
 
 -- Load the local development copy of 99 from pack/mine/opt/99.
-vim.cmd.packadd("99")
+-- vim.cmd.packadd("99")
 
 -- Build step for telescope-fzf-native (compiles a C library).
 local fzf_dir = vim.fn.stdpath("data") .. "/site/pack/core/opt/telescope-fzf-native.nvim"

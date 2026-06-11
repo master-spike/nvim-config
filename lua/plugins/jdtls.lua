@@ -123,6 +123,14 @@ local function start_jdtls()
         configuration = {
           updateBuildConfiguration = "interactive",
         },
+        -- Inlay hints: show parameter names for all arguments. JDT LS's "all"
+        -- mode already suppresses the hint when the argument is a name/field
+        -- matching the parameter name (no separate suppress flag exists).
+        inlayHints = {
+          parameterNames = {
+            enabled = "all",
+          },
+        },
       },
     },
   })

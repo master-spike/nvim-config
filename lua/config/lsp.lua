@@ -28,8 +28,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("config_lsp_attach", { clear = true }),
   callback = function(event)
     local buf = event.buf
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
     local function map(keys, fn, desc)
       vim.keymap.set("n", keys, fn, { buffer = buf, desc = "LSP: " .. desc })
+    end
+
+    -- Enable inlay hints by default for servers that support them.
+    -- Toggle per-buffer with <leader>uh (see config/keymaps.lua).
+    if client and client:supports_method("textDocument/inlayHint") then
+      vim.lsp.inlay_hint.enable(true, { bufnr = buf })
     end
 
     -- Use Telescope pickers for LSP navigation so results open in the picker
@@ -113,6 +120,7 @@ vim.lsp.config("lua_ls", {
       runtime = { version = "LuaJIT" },
       workspace = { checkThirdParty = false },
       diagnostics = { globals = { "vim", "Snacks" } },
+      hint = { enable = true },
     },
   },
 })
@@ -130,6 +138,22 @@ vim.lsp.config("eslint", {
       command = "LspEslintFixAll",
     })
   end,
+})
+
+-- vtsls: enable TypeScript/JavaScript inlay hints.
+local vtsls_inlay = {
+  parameterNames = { enabled = "all", suppressWhenArgumentMatchesName = true },
+  parameterTypes = { enabled = true },
+  variableTypes = { enabled = true },
+  propertyDeclarationTypes = { enabled = true },
+  functionLikeReturnTypes = { enabled = true },
+  enumMemberValues = { enabled = true },
+}
+vim.lsp.config("vtsls", {
+  settings = {
+    typescript = { inlayHints = vtsls_inlay },
+    javascript = { inlayHints = vtsls_inlay },
+  },
 })
 
 -- Enable servers (binaries installed via Mason).
