@@ -10,10 +10,14 @@ telescope.setup({
   },
   extensions = {
     fzf = {},
+    ["ui-select"] = {
+      require("telescope.themes").get_dropdown({}),
+    },
   },
 })
 
 pcall(telescope.load_extension, "fzf")
+pcall(telescope.load_extension, "ui-select")
 
 local builtin = require("telescope.builtin")
 local map = vim.keymap.set
