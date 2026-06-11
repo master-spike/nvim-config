@@ -56,7 +56,7 @@ vim.pack.add({
   { src = "https://github.com/nvim-lua/plenary.nvim" },
   { src = "https://github.com/j-hui/fidget.nvim" },
   { src = "https://github.com/olimorris/codecompanion.nvim" },
-  { src = "https://github.com/master-spike/99", version = "feature/copilot-provider" },
+  { src = "https://github.com/master-spike/99", version = "dev" },
 })
 
 -- Load the local development copy of 99 from pack/mine/opt/99.

@@ -94,6 +94,10 @@ vim.keymap.set("n", "<leader>9s", function()
   _99.search()
 end)
 
+vim.keymap.set("n", "<leader>9h", function()
+  _99.prompt_history()
+end)
+
 vim.keymap.set("n", "<leader>9m", function()
   require("99.extensions.telescope").select_model()
 end)
