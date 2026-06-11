@@ -41,6 +41,7 @@ map("n", "<leader>uh", function()
   local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = 0 })
   vim.lsp.inlay_hint.enable(not enabled, { bufnr = 0 })
 end, { desc = "Toggle inlay hints" })
+map("n", "<leader>uw", "<cmd>set wrap!<CR>", { desc = "Toggle line wrap" })
 
 -- Diagnostics
 map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line diagnostics" })
