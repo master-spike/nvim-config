@@ -8,6 +8,17 @@ require("neo-tree").setup({
         ".git",
       },
     },
+    components = {
+      icon = function(config, node, state)
+        if node.type == "file" and node.link_to then
+          return {
+            text = "→ ",
+            highlight = "NeoTreeSymbolicLinkTarget",
+          }
+        end
+        return require("neo-tree.sources.filesystem.components").icon(config, node, state)
+      end,
+    },
   },
 })
 

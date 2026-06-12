@@ -30,7 +30,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local buf = event.buf
     local client = vim.lsp.get_client_by_id(event.data.client_id)
     local function map(keys, fn, desc)
-      vim.keymap.set("n", keys, fn, { buffer = buf, desc = "LSP: " .. desc })
+      vim.keymap.set("n", keys, fn, { buffer = buf, desc = "LSP: " .. desc, noremap = true })
     end
 
     -- Enable inlay hints by default for servers that support them.
@@ -43,7 +43,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- (and <C-q> sends them to the quickfix list). Fall back to vim.lsp.buf.
     local tb = require("telescope.builtin")
     map("gd", require("util.lsp_definition").goto_definition, "Goto Definition")
-    map("gr", tb.lsp_references, "References")
+    map("gR", tb.lsp_references, "References")
     map("gI", tb.lsp_implementations, "Goto Implementation")
     map("gy", tb.lsp_type_definitions, "Goto Type Definition")
 

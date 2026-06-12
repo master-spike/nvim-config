@@ -42,6 +42,21 @@ map("n", "<leader>uh", function()
   vim.lsp.inlay_hint.enable(not enabled, { bufnr = 0 })
 end, { desc = "Toggle inlay hints" })
 map("n", "<leader>uw", "<cmd>set wrap!<CR>", { desc = "Toggle line wrap" })
+map("n", "<leader>uf", function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local format_enabled_buffer = require("conform")._format_enabled_buffer or {}
+  if format_enabled_buffer[bufnr] == nil then
+    format_enabled_buffer[bufnr] = false
+  else
+    format_enabled_buffer[bufnr] = not format_enabled_buffer[bufnr]
+  end
+  require("conform")._format_enabled_buffer = format_enabled_buffer
+  vim.notify("Buffer formatter " .. (format_enabled_buffer[bufnr] and "enabled" or "disabled"))
+end, { desc = "Toggle formatter (buffer)" })
+map("n", "<leader>uF", function()
+  require("conform")._format_enabled = not (require("conform")._format_enabled or true)
+  vim.notify("Global formatter " .. (require("conform")._format_enabled and "enabled" or "disabled"))
+end, { desc = "Toggle formatter (global)" })
 
 -- Diagnostics
 map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line diagnostics" })

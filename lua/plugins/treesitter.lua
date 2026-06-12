@@ -11,6 +11,7 @@ require("nvim-treesitter.configs").setup({
     "gitcommit",
     "gitignore",
     "haskell",
+    "hocon",
     "html",
     "java",
     "javascript",
@@ -38,3 +39,6 @@ require("nvim-treesitter.configs").setup({
   highlight = { enable = true },
   indent = { enable = true },
 })
+
+-- Map .conf files to hocon
+vim.filetype.add({ extension = { conf = "hocon" } })
