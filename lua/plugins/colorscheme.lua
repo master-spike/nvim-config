@@ -35,7 +35,7 @@ require("material").setup({
 
   styles = { -- Give comments style such as bold, italic, underline etc.
     comments = { italic = true },
-    strings = {},
+    strings = { italic = true },
     keywords = {},
     functions = {},
     variables = {},
@@ -87,7 +87,7 @@ require("material").setup({
 
   high_visibility = {
     lighter = false, -- Enable higher contrast text for lighter style
-    darker = false, -- Enable higher contrast text for darker style
+    darker = true, -- Enable higher contrast text for darker style
   },
 
   lualine_style = "default", -- Lualine style ( can be 'stealth' or 'default' )
@@ -96,7 +96,9 @@ require("material").setup({
 
   custom_colors = nil, -- If you want to override the default colors, set this to a function
 
-  custom_highlights = {}, -- Overwrite highlights with your own
+  custom_highlights = {
+    LspInlayHint = { bg = "#323232", fg = "#D0D8E0", italic = true },
+  },
 })
 
 vim.g.material_style = "darker"
