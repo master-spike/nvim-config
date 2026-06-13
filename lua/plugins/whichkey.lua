@@ -6,6 +6,8 @@ wk.setup({
 -- Keymap group labels.
 wk.add({
   { "<leader>u", group = "ui" },
+  { "<leader>uf", desc = "Toggle formatter (buffer)" },
+  { "<leader>uF", desc = "Toggle formatter (global)" },
 })
 
 -- Describe mini.ai text objects so they appear in which-key after the

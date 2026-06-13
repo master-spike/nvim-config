@@ -1,6 +1,8 @@
 -- Formatting via conform.nvim (ported java + markdown/prettier config)
-local format_enabled = true
-local format_enabled_buffer = {} -- per-buffer overrides
+_G.conform_format_state = {
+  enabled = true,
+  buffer_overrides = {},
+}
 
 require("conform").setup({
   formatters_by_ft = {
@@ -26,10 +28,13 @@ require("conform").setup({
   },
   format_on_save = function()
     local bufnr = vim.api.nvim_get_current_buf()
-    if format_enabled_buffer[bufnr] ~= nil then
-      return format_enabled_buffer[bufnr] and { timeout_ms = 3000, lsp_format = "fallback" } or nil
+    local state = _G.conform_format_state
+    -- Check buffer-specific override first, then fall back to global
+    local enabled = state.buffer_overrides[bufnr]
+    if enabled == nil then
+      enabled = state.enabled
     end
-    return format_enabled and { timeout_ms = 3000, lsp_format = "fallback" } or nil
+    return enabled and { timeout_ms = 3000, lsp_format = "fallback" } or nil
   end,
 })
 
