@@ -21,7 +21,11 @@ require("kanagawa").setup({
   end,
 })
 
-require("material").setup({
+vim.g.material_style = "darker"
+local material = require("material")
+local material_colors = require("material.colors")
+
+material.setup({
 
   contrast = {
     terminal = false, -- Enable contrast for the built-in terminal
@@ -40,7 +44,7 @@ require("material").setup({
     functions = {},
     variables = {},
     operators = {},
-    types = {},
+    types = { bold = true },
   },
 
   plugins = { -- Uncomment the plugins that you use to highlight them
@@ -87,19 +91,29 @@ require("material").setup({
 
   high_visibility = {
     lighter = false, -- Enable higher contrast text for lighter style
-    darker = true, -- Enable higher contrast text for darker style
+    darker = false, -- Enable higher contrast text for darker style
   },
 
   lualine_style = "default", -- Lualine style ( can be 'stealth' or 'default' )
 
-  async_loading = true, -- Load parts of the theme asynchronously for faster startup (turned on by default)
+  async_loading = false, -- Load parts of the theme asynchronously for faster startup (turned on by default)
 
   custom_colors = nil, -- If you want to override the default colors, set this to a function
 
   custom_highlights = {
     LspInlayHint = { bg = "#323232", fg = "#D0D8E0", italic = true },
+    ["@keyword"] = { fg = material_colors.main.orange },
+    ["@keyword.builtin"] = { fg = material_colors.main.orange },
+    ["@attribute"] = { fg = material_colors.main.purple }, -- Annotations without background
+    ["@attribute.builtin"] = { fg = material_colors.main.purple },
+    ["@property"] = { fg = material_colors.editor.fg },
+    -- Completion menu background (blink.cmp and similar)
+    Pmenu = { bg = material_colors.editor.bg_alt },
+    PmenuSel = { bg = material_colors.editor.active },
+    BlinkCmpMenu = { bg = material_colors.editor.bg_alt },
+    BlinkCmpMenuBorder = { fg = material_colors.editor.border, bg = material_colors.editor.bg_alt },
+    BlinkCmpMenuSelection = { bg = material_colors.editor.active },
   },
 })
 
-vim.g.material_style = "darker"
 vim.cmd.colorscheme("material")
