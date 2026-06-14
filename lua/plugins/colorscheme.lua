@@ -119,7 +119,17 @@ material.setup({
     BlinkCmpMenu = { bg = material_colors.editor.bg_alt },
     BlinkCmpMenuBorder = { fg = material_colors.editor.border, bg = material_colors.editor.bg_alt },
     BlinkCmpMenuSelection = { bg = material_colors.editor.active },
+
+    -- which-key floating window
+    WhichKeyFloat = { bg = material_colors.editor.bg_alt },
+    WhichKeyBorder = { fg = material_colors.editor.border, bg = material_colors.editor.bg_alt },
   },
 })
 
 vim.cmd.colorscheme("material")
+
+-- Set which-key window background after colorscheme loads
+local material_colors = require("material.colors")
+vim.api.nvim_set_hl(0, "WhichKeyFloat", { bg = material_colors.editor.bg_alt })
+vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = material_colors.editor.border, bg = material_colors.editor.bg_alt })
+vim.api.nvim_set_hl(0, "WhichKeyNormal", { bg = material_colors.editor.bg_alt })

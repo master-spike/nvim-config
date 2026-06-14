@@ -1,6 +1,16 @@
 local wk = require("which-key")
+local material_colors = require("material.colors")
+
 wk.setup({
   delay = 0,
+  win = {
+    no_overlap = false,
+    padding = { 1, 2 },
+    title_pos = "center",
+    wo = {
+      winblend = 0,
+    },
+  },
 })
 
 -- Keymap group labels.
