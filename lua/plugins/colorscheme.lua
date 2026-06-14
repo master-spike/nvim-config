@@ -102,11 +102,17 @@ material.setup({
 
   custom_highlights = {
     LspInlayHint = { bg = "#323232", fg = "#D0D8E0", italic = true },
+
+    -- Syntax highlighting colors
+    Keyword = { fg = material_colors.main.orange },
     ["@keyword"] = { fg = material_colors.main.orange },
     ["@keyword.builtin"] = { fg = material_colors.main.orange },
+    ["@type.qualifier"] = { fg = material_colors.main.orange },
     ["@attribute"] = { fg = material_colors.main.purple }, -- Annotations without background
     ["@attribute.builtin"] = { fg = material_colors.main.purple },
     ["@property"] = { fg = material_colors.editor.fg },
+    ["@lsp.type.interface"] = { link = "@type" }, -- material links interface to identifier by default
+
     -- Completion menu background (blink.cmp and similar)
     Pmenu = { bg = material_colors.editor.bg_alt },
     PmenuSel = { bg = material_colors.editor.active },
