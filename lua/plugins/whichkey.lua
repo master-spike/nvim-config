@@ -1,6 +1,6 @@
 local wk = require("which-key")
 wk.setup({
-  delay = 0, -- reduce delay so which-key doesn't interfere with fast key sequences
+  delay = 0,
 })
 
 -- Keymap group labels.
