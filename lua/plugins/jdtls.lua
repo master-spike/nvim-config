@@ -131,6 +131,12 @@ local function start_jdtls()
             enabled = "all",
           },
         },
+        -- jdtls disables signature help by default; enable it so the
+        -- signature popup works (clangd provides this out of the box).
+        signatureHelp = {
+          enabled = true,
+          description = { enabled = true },
+        },
       },
     },
   })
