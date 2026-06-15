@@ -25,6 +25,7 @@ vim.pack.add({
   { src = "https://github.com/neovim/nvim-lspconfig" },
   { src = "https://github.com/mason-org/mason.nvim" },
   { src = "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim" },
+  { src = "https://github.com/nabekou29/js-i18n.nvim" },
 
   -- Completion
   { src = "https://github.com/saghen/blink.cmp", version = "v1.6.0" },
@@ -100,6 +101,7 @@ local modules = {
   "fidget",
   "codecompanion",
   "neo-tree",
+  "js-i18n",
 }
 
 for _, m in ipairs(modules) do

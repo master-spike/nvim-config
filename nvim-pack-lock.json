@@ -42,6 +42,10 @@
       "rev": "154eb5ff5b96d0641307113fa385eaf0d36d9796",
       "src": "https://github.com/ellisonleao/gruvbox.nvim"
     },
+    "js-i18n.nvim": {
+      "rev": "178732fe804870153cba104596224866ba978676",
+      "src": "https://github.com/nabekou29/js-i18n.nvim"
+    },
     "kanagawa": {
       "rev": "bb85e4bfc8d89b0e62c8fa53ccdd13d12e2f77b3",
       "src": "https://github.com/rebelot/kanagawa.nvim"
