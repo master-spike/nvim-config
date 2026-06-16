@@ -3,8 +3,8 @@ require("flash").setup()
 
 local flash = require("flash")
 
--- Standard flash keymaps (mirrors the LazyVim defaults).
-vim.keymap.set({ "n", "x", "o" }, "s", function()
+-- Remap flash from 's' to 'gs' to avoid conflict with surround plugin
+vim.keymap.set({ "n", "x", "o" }, "gs", function()
   flash.jump()
 end, { desc = "Flash" })
 
