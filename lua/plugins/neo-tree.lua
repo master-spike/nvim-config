@@ -1,4 +1,7 @@
 require("neo-tree").setup({
+  window = {
+    position = "current",
+  },
   filesystem = {
     filtered_items = {
       visible = false, -- Hide the items matched below
