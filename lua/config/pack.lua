@@ -7,10 +7,7 @@ vim.pack.add({
   { src = "https://github.com/MunifTanjim/nui.nvim" },
 
   -- Colorschemes
-  { src = "https://github.com/ellisonleao/gruvbox.nvim" },
-  { src = "https://github.com/EdenEast/nightfox.nvim" },
-  { src = "https://github.com/catppuccin/nvim", name = "catppuccin" },
-  { src = "https://github.com/rebelot/kanagawa.nvim", name = "kanagawa" },
+  { src = "https://github.com/marko-cerovac/material.nvim" },
 
   -- Treesitter (master branch = classic setup API, stable on 0.12)
   { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "master" },
@@ -62,7 +59,6 @@ vim.pack.add({
   { src = "https://github.com/j-hui/fidget.nvim" },
   { src = "https://github.com/olimorris/codecompanion.nvim" },
   { src = "https://github.com/master-spike/99", version = "dev" },
-  { src = "https://github.com/marko-cerovac/material.nvim" },
 })
 
 -- Load the local development copy of 99 from pack/mine/opt/99.

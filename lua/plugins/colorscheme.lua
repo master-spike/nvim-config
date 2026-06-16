@@ -1,26 +1,3 @@
--- Colorscheme: gruvbox (with previous overrides) + nightfox available.
-require("gruvbox").setup({
-  overrides = {
-    LspInlayHint = { bg = "#504945" },
-    GitSignsAdd = { fg = "#76CD30" },
-    GitSignsAddLn = { fg = "#76CD30" },
-    GitSignsChange = { fg = "#64B0C3" },
-    GitSignsChangeLn = { fg = "#64B0C3" },
-  },
-})
-
-require("kanagawa").setup({
-  overrides = function(colors)
-    return {
-      LspInlayHint = { bg = "#403935" },
-      GitSignsAdd = { fg = "#46BD30" },
-      GitSignsAddLn = { fg = "#4BCD30" },
-      GitSignsChange = { fg = "#3490C3" },
-      GitSignsChangeLn = { fg = "#3490C3" },
-    }
-  end,
-})
-
 vim.g.material_style = "darker"
 local material = require("material")
 local material_colors = require("material.colors")
@@ -129,7 +106,6 @@ material.setup({
 vim.cmd.colorscheme("material")
 
 -- Set which-key window background after colorscheme loads
-local material_colors = require("material.colors")
 vim.api.nvim_set_hl(0, "WhichKeyFloat", { bg = material_colors.editor.bg_alt })
 vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = material_colors.editor.border, bg = material_colors.editor.bg_alt })
 vim.api.nvim_set_hl(0, "WhichKeyNormal", { bg = material_colors.editor.bg_alt })

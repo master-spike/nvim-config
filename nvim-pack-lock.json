@@ -14,10 +14,6 @@
       "rev": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3",
       "src": "https://github.com/akinsho/bufferline.nvim"
     },
-    "catppuccin": {
-      "rev": "0303a7208dba448c459767486a38a6ec05c4216b",
-      "src": "https://github.com/catppuccin/nvim"
-    },
     "codecompanion.nvim": {
       "rev": "123d8b3428b321ade9a8c1b749a65e4021a14dd0",
       "src": "https://github.com/olimorris/codecompanion.nvim"
@@ -40,7 +36,7 @@
     },
     "gruvbox.nvim": {
       "rev": "154eb5ff5b96d0641307113fa385eaf0d36d9796",
-      "src": "https://github.com/ellisonleao/gruvbox.nvim"
+      "src": "git@github.com:ellisonleao/gruvbox.nvim"
     },
     "js-i18n.nvim": {
       "rev": "178732fe804870153cba104596224866ba978676",
@@ -48,7 +44,7 @@
     },
     "kanagawa": {
       "rev": "bb85e4bfc8d89b0e62c8fa53ccdd13d12e2f77b3",
-      "src": "https://github.com/rebelot/kanagawa.nvim"
+      "src": "git@github.com:rebelot/kanagawa.nvim"
     },
     "lualine.nvim": {
       "rev": "221ce6b2d999187044529f49da6554a92f740a96",
@@ -81,7 +77,7 @@
     },
     "nightfox.nvim": {
       "rev": "26b61b1f856ec37cae3cb64f5690adb955f246a1",
-      "src": "https://github.com/EdenEast/nightfox.nvim"
+      "src": "git@github.com:EdenEast/nightfox.nvim"
     },
     "nui.nvim": {
       "rev": "de740991c12411b663994b2860f1a4fd0937c130",
