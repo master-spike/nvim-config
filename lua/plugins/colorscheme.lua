@@ -100,6 +100,9 @@ material.setup({
     -- which-key floating window
     WhichKeyFloat = { bg = material_colors.editor.bg_alt },
     WhichKeyBorder = { fg = material_colors.editor.border, bg = material_colors.editor.bg_alt },
+
+    -- Telescope filename component (set by telescope path_display style)
+    TelescopeResultsFileName = { fg = material_colors.main.orange },
   },
 })
 

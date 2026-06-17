@@ -105,6 +105,7 @@ material.setup({
       fg = material_colors.editor.border,
       bg = material_colors.editor.bg_alt,
     },
+    TelescopeResultsFileName = { fg = material_colors.main.orange },
   },
 })
 

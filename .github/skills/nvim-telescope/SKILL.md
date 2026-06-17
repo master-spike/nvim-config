@@ -28,7 +28,11 @@ telescope.setup({
     sorting_strategy = "ascending",
     winblend = 0,
     path_display = function(_, path)
-      return require("util.path").collapse(path)   -- minify path globally
+      -- returns (string, style); style colours the filename component
+      local collapsed = require("util.path").collapse(path)
+      local filename = collapsed:match("[^/]+$") or collapsed
+      local start = #collapsed - #filename
+      return collapsed, { { { start, #collapsed }, "TelescopeResultsFileName" } }
     end,
   },
   extensions = {
@@ -45,35 +49,85 @@ startup. fzf-native needs its C lib built — `pack.lua` runs `make` if
 
 ## The path_display pattern (IMPORTANT — reuse, don't reinvent)
 `path_display` is a **documented telescope default** that can be a function
-`(opts, path) -> string`. Setting it once in `defaults` rewrites the displayed
-path for **every** picker that shows a file (find_files, live_grep, oldfiles,
-LSP pickers, quickfix, ...). This is the one-size-fits-all hook — prefer it over
-wrapping individual pickers with a custom `entry_maker`.
+`(opts, path) -> string, style?`. Setting it once in `defaults` rewrites the
+displayed path for **every** picker that shows a file (find_files, live_grep,
+oldfiles, LSP pickers, quickfix, ...). This is the one-size-fits-all hook —
+prefer it over wrapping individual pickers with a custom `entry_maker`.
+
+### Colouring part of the path (the filename)
+`path_display` may return a **second value**: a `path_style` highlights table of
+the form `{ { { byte_start, byte_end }, "HlGroup" }, ... }` (0-based,
+end-exclusive byte columns). `utils.transform_path` forwards this style, and
+`utils.merge_styles` offsets it past any devicon, so the colour lands on the
+right characters in every picker. This config uses it to colour just the final
+filename component with `TelescopeResultsFileName` — a dedicated group defined in
+`lua/plugins/colorscheme.lua`'s `custom_highlights` as orange
+(`material_colors.main.orange`) — leaving the directory prefix in the default
+colour. A dedicated group (not the built-in `TelescopeResultsIdentifier`) is
+used so git/branch pickers that share `TelescopeResultsIdentifier` keep their
+colour:
+```lua
+path_display = function(_, path)
+  local collapsed = require("util.path").collapse(path)
+  local filename = collapsed:match("[^/]+$") or collapsed
+  local start = #collapsed - #filename
+  return collapsed, { { { start, #collapsed }, "TelescopeResultsFileName" } }
+end,
+```
+Ground truth for the style mechanism: `utils.transform_path` (returns
+`custom_transformed_path, custom_path_style`) and `path_filename_first`
+(builds the same `{ {start,end}, hl }` shape) in `lua/telescope/utils.lua`;
+the highlight format is documented in `lua/telescope/make_entry.lua` as
+`{ { start_col, end_col }, hl_group }`.
 
 This was a real lesson in this repo: an earlier attempt used a non-existent
 `telescope.finders.entry_from_file` as a custom `entry_maker`, which returned
-`nil` and made all results vanish. The correct, simple solution was the built-in
-`path_display` function. **Confirm the API in the installed source before
-writing a custom maker** (see `nvim-testing-and-verification`). The real entry
-makers, if you ever need them, are in `telescope.make_entry`
-(`gen_from_file`, `gen_from_vimgrep`), and `utils.transform_path` is what calls
-`path_display`.
+`nil` and made all results vanish. A later attempt split the path with
+`entry_display.create` + a custom `entry_maker` and dropped the `/` between
+directory and filename. The correct, simple solution is the built-in
+`path_display` function returning `(string, style)` — no per-picker
+`entry_maker`. **Confirm the API in the installed source before writing a custom
+maker** (see `nvim-testing-and-verification`). The real entry makers, if you
+ever need them, are in `telescope.make_entry` (`gen_from_file`,
+`gen_from_vimgrep`), and `utils.transform_path` is what calls `path_display`.
 
 ## Keymaps (defined in telescope.lua)
 ```
-<leader><space> / <leader>ff  find_files
-<leader>f/ , <leader>sg        live_grep
+<leader><space> / <leader>ff  find_files (custom wrapper)
+<leader>f/ , <leader>sg        live_grep  (custom wrapper)
 <leader>fb                     buffers
 <leader>fh                     help_tags
 <leader>fr                     oldfiles
 <leader>sk                     keymaps
 ```
-Add a picker keymap: `map("n", "<leader>fX", builtin.<picker>, {desc=...})`.
+`<leader>ff` and `<leader>f/` are bound to **local wrapper functions**
+(`find_files` / `live_grep` in telescope.lua), NOT `builtin.*`, because they add
+the `<C-y>` toggle below. The other maps still use `builtin.*`.
+Add a plain picker keymap: `map("n", "<leader>fX", builtin.<picker>, {desc=...})`.
 List real builtin pickers:
 ```bash
 nvim --headless -u init.lua \
   -c 'lua print(vim.inspect(vim.tbl_keys(require("telescope.builtin"))))' -c 'qa!'
 ```
+
+## In-picker toggle: include-ignored (`<C-y>`)
+`<leader>ff`/`<leader>f/` are bound to local wrapper functions (`find_files` /
+`live_grep` in telescope.lua) — they delegate to `builtin.find_files` /
+`builtin.live_grep` but add a shared module-level boolean `include_ignored`
+(default `false`) and one mapping (insert + normal):
+
+- **`<C-y>` (both pickers) — toggle gitignored files.** Flips `include_ignored`,
+  then `actions.close` + reopen the same picker with `default_text` = current
+  prompt. find_files drops/adds `--exclude-standard` on `git ls-files`;
+  live_grep adds/removes `--no-ignore` via `opts.additional_args`. Title shows
+  `(+ignored)` when on. (`<C-y>` is used instead of `<C-i>` because `<C-i>` ==
+  `<Tab>` in most terminals and would shadow Telescope's multi-select.)
+- **No `<C-h>`.** Dotfiles are ALWAYS searched: `git ls-files` lists them and
+  live_grep's rg args always include `--hidden` (plus `--glob !**/.git/**` so it
+  never descends into `.git`). They are intentionally never treated differently.
+
+find_files no longer sets `pickers.find_files.find_command` in `telescope.setup`
+— the wrapper builds the command per call from `include_ignored`.
 
 ## Building a custom picker
 See `lua/plugins/gitsigns.lua` for a worked example (the git-hunks picker:
