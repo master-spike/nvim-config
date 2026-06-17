@@ -2,9 +2,9 @@
 name: nvim-99
 description: >-
   How the local 99 AI plugin is configured with CopilotProvider, native
-  #rules/@files completion, AGENT.md auto-context, debug logging, and
-  <leader>9 keymaps. Use when editing 99 setup, model selection, prompt
-  history, visual/search workflows, or distinguishing 99 from CodeCompanion.
+  #rules/@files completion, AGENT.md auto-context, debug logging, and <leader>9
+  keymaps. Use when editing 99 setup, model selection, prompt history,
+  visual/search workflows, or distinguishing 99 from CodeCompanion.
 covers:
   - lua/plugins/99.lua
 ---
@@ -74,11 +74,11 @@ The selected provider is `_99.Providers.CopilotProvider`. Installed source
 provider is set. `lua/99/providers.lua` also exports `ClaudeCodeProvider`.
 
 Native prompt-buffer completion is configured with `source = "native"`.
-Installed source `lua/99/extensions/init.lua` loads
-`99.extensions.native` for that source. Native completion registers `#` rules
-from `scratch/custom_rules/*/SKILL.md` and `@` files from project discovery.
-File discovery uses `git ls-files --cached --others --exclude-standard` in git
-repos and applies the configured `files.exclude` list.
+Installed source `lua/99/extensions/init.lua` loads `99.extensions.native` for
+that source. Native completion registers `#` rules from
+`scratch/custom_rules/*/SKILL.md` and `@` files from project discovery. File
+discovery uses `git ls-files --cached --others --exclude-standard` in git repos
+and applies the configured `files.exclude` list.
 
 `md_files = { "AGENT.md" }` makes 99 look for `AGENT.md` context files while
 building prompts. The config comment in `lua/plugins/99.lua` warns this is tied
@@ -95,14 +95,11 @@ to the current working directory.
   the config comments about external-directory permissions.
 - `<leader>9m` requires Telescope. See `nvim-telescope` before changing that
   picker integration.
-- Do not confuse 99's Copilot CLI provider with CodeCompanion's Copilot HTTP
-  adapter. Both AI tools coexist in this config.
 
 ## Docs / ground truth
 
 - Config: `lua/plugins/99.lua`.
-- Installed source/docs:
-  `~/.local/share/nvim/site/pack/core/opt/99/`.
+- Installed source/docs: `~/.local/share/nvim/site/pack/core/opt/99/`.
 - Source checked: `lua/99/init.lua`, `lua/99/providers.lua`,
   `lua/99/extensions/init.lua`, `lua/99/extensions/native.lua`,
   `lua/99/extensions/agents/init.lua`, `lua/99/extensions/files/init.lua`, and

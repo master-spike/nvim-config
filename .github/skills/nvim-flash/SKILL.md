@@ -26,63 +26,28 @@ Ground truth:
 
 ## What's configured
 
-The real setup uses defaults:
+The setup uses Flash's defaults. No custom keymaps are set because `gs` is now
+used by mini.surround for surround operators:
 
 ```lua
 require("flash").setup()
 ```
 
-The real keymaps in `lua/plugins/flash.lua`:
-
-```lua
-local flash = require("flash")
-
--- Remap flash from 's' to 'gs' to avoid conflict with surround plugin
-vim.keymap.set({ "n", "x", "o" }, "gs", function()
-  flash.jump()
-end, { desc = "Flash" })
-
-vim.keymap.set({ "n", "x", "o" }, "S", function()
-  flash.treesitter()
-end, { desc = "Flash Treesitter" })
-
-vim.keymap.set("o", "r", function()
-  flash.remote()
-end, { desc = "Remote Flash" })
-
-vim.keymap.set({ "o", "x" }, "R", function()
-  flash.treesitter_search()
-end, { desc = "Treesitter Search" })
-
-vim.keymap.set("c", "<c-s>", function()
-  flash.toggle()
-end, { desc = "Toggle Flash Search" })
-```
+Flash's other features remain available via default keymaps.
 
 ## Capabilities + examples
 
-```text
-gs        normal, visual, operator-pending: flash.jump()
-S         normal, visual, operator-pending: flash.treesitter()
-r         operator-pending only: flash.remote()
-R         visual and operator-pending: flash.treesitter_search()
-<c-s>     command-line mode: flash.toggle()
-```
-
-Use `gs`, not `s`, for the main Flash jump. The config comment is the source of
-truth for why: `Remap flash from 's' to 'gs' to avoid conflict with surround
-plugin`. Do not reintroduce an `s` Flash map unless you also check the surround
-setup in `nvim-mini`.
+Flash is available via the following default keymaps (consult `:help flash`):
+- `f`/`F`/`t`/`T`: Char mode (enhanced f/F/t/T with labels)
+- `S`: Flash Treesitter search
 
 ## Gotchas / version notes
 
-- `flash.setup()` is called with no options. Defaults come from the pinned
-  plugin source in `flash.nvim/lua/flash/config.lua`.
-- The upstream docs show default examples with `s`, `S`, `r`, `R`, and `<c-s>`.
-  This config changes only the main `s` jump to `gs`.
+- `flash.setup()` is called with defaults. Char mode (f/F/t/T) is enabled.
+- The `gs` keybinding (formerly used for `flash.jump`) is now used by
+  mini.surround for surround operators. Flash's main jump is unavailable.
 - Flash command functions exist in `flash.nvim/lua/flash/commands.lua`:
   `jump`, `treesitter`, `treesitter_search`, `remote`, and `toggle`.
-- `r` is mapped only in operator-pending mode. Do not add normal-mode `r`.
 
 ## Docs / ground truth
 
@@ -107,11 +72,8 @@ nvim --headless -u init.lua -c 'lua
   local flash = require("flash")
   assert(type(flash.jump) == "function")
   assert(type(flash.treesitter) == "function")
-  assert(type(flash.remote) == "function")
-  assert(type(flash.treesitter_search) == "function")
-  assert(type(flash.toggle) == "function")
-  assert(vim.fn.maparg("gs", "n") ~= "")
-  assert(vim.fn.maparg("<c-s>", "c") ~= "")
+  -- gs is no longer mapped (used by surround)
+  assert(vim.fn.maparg("gs", "n") == "", "gs should not be mapped (surround uses it)")
   print("PASS flash")
 ' -c 'qa!' 2>&1 | grep -v tbl_flatten
 ```

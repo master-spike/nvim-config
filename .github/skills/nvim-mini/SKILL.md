@@ -55,7 +55,16 @@ ai.setup({
   },
 })
 
-require("mini.surround").setup()
+require("mini.surround").setup({
+  mappings = {
+    add = "gsa",      -- Add surrounding
+    delete = "gsd",   -- Delete surrounding
+    find = "gsf",     -- Find surrounding
+    find_left = "gsF", -- Find left surrounding
+    highlight = "gsh", -- Highlight surrounding
+    replace = "gsr",  -- Replace surrounding
+  },
+})
 require("mini.icons").setup()
 ```
 
@@ -83,8 +92,19 @@ daa  delete around argument
 cia  change inside argument
 ```
 
-Use `mini.surround` defaults. Verify mappings in `mini-surround.txt` before
-changing them. Do not assume a surround mapping from another plugin.
+Use `mini.surround` with the `gs` prefix (to avoid conflicts with Flash and other plugins):
+
+```text
+gsa{char}  add surrounding with {char}
+gsd{char}  delete surrounding {char}
+gsr{char1}{char2}  replace {char1} surrounding with {char2}
+gsf{char}  find surrounding {char}
+gsF{char}  find left surrounding {char}
+gsh{char}  highlight surrounding {char}
+```
+
+Extend these with suffixes for search method:
+- `n` or `l` for "next" / "last" (e.g., `gsan` adds next surrounding)
 
 Use `mini.icons` defaults. It is set up only by
 `require("mini.icons").setup()` in `lua/plugins/mini.lua`.
@@ -107,6 +127,9 @@ Read `nvim-treesitter` before editing parser queries or captures.
 - Only three mini modules are enabled. Do not add `mini.pairs` unless asked.
 - `n_lines = 500` is configured for `mini.ai`; the upstream default in
   `mini.nvim/lua/mini/ai.lua` is `50` at this pinned rev.
+- `mini.surround` mappings use the `gs` prefix instead of the default `s` prefix
+  to avoid conflicts with Flash and Vim's default substitute command. The mappings
+  are customized in the `setup()` call in `lua/plugins/mini.lua`.
 - `ai.gen_spec.treesitter(...)` exists in `mini.nvim/lua/mini/ai.lua` and is
   documented as `MiniAi.gen_spec.treesitter()`.
 - The custom argument object returns a `mini.ai` region with 1-based line and
@@ -143,6 +166,10 @@ nvim --headless -u init.lua -c 'lua
   assert(type(ai.config.custom_textobjects.f) == "function")
   assert(type(require("mini.surround").config) == "table")
   assert(type(require("mini.icons")) == "table")
+  -- Verify gs prefix surround mappings
+  assert(vim.fn.maparg("gsa", "n") ~= "", "gsa should be mapped")
+  assert(vim.fn.maparg("gsd", "n") ~= "", "gsd should be mapped")
+  assert(vim.fn.maparg("gsr", "n") ~= "", "gsr should be mapped")
   print("PASS mini")
 ' -c 'qa!' 2>&1 | grep -v tbl_flatten
 ```

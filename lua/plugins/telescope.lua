@@ -16,6 +16,17 @@ telescope.setup({
       return path_util.collapse(path)
     end,
   },
+  pickers = {
+    find_files = {
+      find_command = {
+        "git",
+        "ls-files",
+        "--cached",
+        "--others",
+        "--exclude-standard",
+      },
+    },
+  },
   extensions = {
     fzf = {},
     ["ui-select"] = {
