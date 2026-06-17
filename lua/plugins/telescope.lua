@@ -1,5 +1,6 @@
 -- Telescope + fzf-native
 local telescope = require("telescope")
+local path_util = require("util.path")
 
 telescope.setup({
   defaults = {
@@ -7,6 +8,13 @@ telescope.setup({
     layout_config = { prompt_position = "top" },
     sorting_strategy = "ascending",
     winblend = 0,
+    -- Minify paths in every picker that displays a filepath (find_files,
+    -- live_grep, oldfiles, lsp, quickfix, ...) using the same collapsing rule
+    -- as the lualine statusline. path_display receives the path telescope is
+    -- about to show and returns the string to render.
+    path_display = function(_, path)
+      return path_util.collapse(path)
+    end,
   },
   extensions = {
     fzf = {},

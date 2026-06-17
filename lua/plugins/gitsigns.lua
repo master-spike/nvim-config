@@ -1,3 +1,5 @@
+local path_util = require("util.path")
+
 require("gitsigns").setup({
   on_attach = function(bufnr)
     local gitsigns = require("gitsigns")
@@ -167,10 +169,11 @@ vim.keymap.set("n", "<leader>fg", function()
             results = entries,
             entry_maker = function(item)
               local rel = vim.fn.fnamemodify(item.filename, ":.")
+              local minified = path_util.collapse(rel)
               return {
                 value = item,
                 ordinal = rel .. " " .. item.text,
-                display = rel .. " │ " .. item.text,
+                display = minified .. " │ " .. item.text,
                 filename = item.filename,
                 path = item.filename,
                 lnum = item.lnum,

@@ -14,6 +14,10 @@
       "rev": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3",
       "src": "https://github.com/akinsho/bufferline.nvim"
     },
+    "catppuccin": {
+      "rev": "0303a7208dba448c459767486a38a6ec05c4216b",
+      "src": "git@github.com:catppuccin/nvim"
+    },
     "codecompanion.nvim": {
       "rev": "123d8b3428b321ade9a8c1b749a65e4021a14dd0",
       "src": "https://github.com/olimorris/codecompanion.nvim"
