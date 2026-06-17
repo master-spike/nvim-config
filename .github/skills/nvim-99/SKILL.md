@@ -19,8 +19,7 @@ version `'dev'`. Upstream is https://github.com/master-spike/99.
 ## Role
 
 Use 99 for the user's custom AI workflows: visual replacement, project search,
-prompt history, request cancellation, and model picking. It is distinct from
-CodeCompanion; see `nvim-codecompanion` for `<leader>a` mappings.
+prompt history, request cancellation, and model picking.
 
 ## What's configured
 

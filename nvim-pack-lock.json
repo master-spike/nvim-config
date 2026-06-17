@@ -19,8 +19,8 @@
       "src": "git@github.com:catppuccin/nvim"
     },
     "codecompanion.nvim": {
-      "rev": "123d8b3428b321ade9a8c1b749a65e4021a14dd0",
-      "src": "https://github.com/olimorris/codecompanion.nvim"
+      "rev": "52e44e0f048be51a2892989de0d86e79f70aecad",
+      "src": "git@github.com:olimorris/codecompanion.nvim"
     },
     "conform.nvim": {
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",

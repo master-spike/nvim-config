@@ -127,7 +127,7 @@ don't duplicate.
 - One skill per plugin: `nvim-telescope`, `nvim-blink-cmp`, `nvim-conform`,
   `nvim-lint`, `nvim-mini`, `nvim-gitsigns`, `nvim-lualine`, `nvim-neo-tree`,
   `nvim-snacks`, `nvim-trouble`, `nvim-which-key`, `nvim-flash`, `nvim-octo`,
-  `nvim-codecompanion`, `nvim-jdtls`, `nvim-render-markdown`, `nvim-mason`,
+  `nvim-jdtls`, `nvim-render-markdown`, `nvim-mason`,
   `nvim-99`, `nvim-colorscheme`, and `nvim-misc-plugins` (the small ones).
 
 ## Verify your change

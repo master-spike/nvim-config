@@ -43,7 +43,6 @@ The mapping is also stored per-skill in each `SKILL.md` frontmatter as a
 | `lua/config/pack.lua`             | `nvim-config-overview`, `nvim-pack-management` |
 | `lua/plugins/99.lua`              | `nvim-99` |
 | `lua/plugins/bufferline.lua`      | `nvim-misc-plugins` |
-| `lua/plugins/codecompanion.lua`   | `nvim-codecompanion` |
 | `lua/plugins/colorizer.lua`       | `nvim-misc-plugins` |
 | `lua/plugins/colorscheme.lua`     | `nvim-colorscheme` |
 | `lua/plugins/completion.lua`      | `nvim-blink-cmp` |

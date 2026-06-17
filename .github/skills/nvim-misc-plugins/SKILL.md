@@ -26,7 +26,7 @@ source under `~/.local/share/nvim/site/pack/core/opt/`, and
 
 Make small UI/plugin changes without hallucinating commands or setup keys. Read
 the local config and installed docs before editing. Cross-reference
-`nvim-testing-and-verification`, `nvim-snacks`, `nvim-codecompanion`, and
+`nvim-testing-and-verification`, `nvim-snacks`, and
 `nvim-core-options-keymaps-autocmds` when a change crosses plugin boundaries.
 
 ## What's configured
@@ -143,9 +143,7 @@ require("fidget").setup({
 })
 ```
 
-Cross-plugin coupling: `lua/plugins/codecompanion.lua` uses
-`require("fidget.progress")` and `progress.handle.create(...)` for the
-CodeCompanion spinner. See `nvim-codecompanion` before changing Fidget setup.
+Fidget is used for LSP progress and other async operations.
 
 Docs: `:help fidget`, `:help fidget.setup`,
 `:help fidget.option.notification.window.winblend`, `:help fidget.progress`.

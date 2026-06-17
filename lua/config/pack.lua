@@ -57,7 +57,6 @@ vim.pack.add({
   -- AI
   { src = "https://github.com/nvim-lua/plenary.nvim" },
   { src = "https://github.com/j-hui/fidget.nvim" },
-  { src = "https://github.com/olimorris/codecompanion.nvim" },
   { src = "https://github.com/master-spike/99", version = "dev" },
 })
 
@@ -97,7 +96,6 @@ local modules = {
   "tmux-navigator",
   "minesweeper",
   "fidget",
-  "codecompanion",
   "neo-tree",
   "js-i18n",
 }

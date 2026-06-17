@@ -1,6 +1,5 @@
 -- fidget.nvim: lightweight progress notifications in the bottom-right corner.
--- Used here as the "little spinner" indicator for codecompanion requests
--- (wired up in plugins/codecompanion.lua) and for LSP progress generally.
+-- Used for LSP progress and other async operations.
 require("fidget").setup({
   notification = {
     window = {

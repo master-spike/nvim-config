@@ -63,7 +63,6 @@ The approach is adapted from LazyVim, but this repo is not LazyVim.
 - Do not hard-code mini.ai prefixes. The file reads them from
   `require("mini.ai").config.mappings` so remaps stay in sync.
 - `wk.add()` is the v3 mapping API documented in `doc/which-key.nvim.txt`.
-- Other files may add groups too; `codecompanion` adds `<leader>a = "AI"`.
 
 ## Docs / ground truth
 - Config: `lua/plugins/whichkey.lua`; pack entry: `lua/config/pack.lua`.
