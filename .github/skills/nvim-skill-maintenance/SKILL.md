@@ -32,48 +32,49 @@ The mapping is also stored per-skill in each `SKILL.md` frontmatter as a
 (see "Regenerating the index").
 
 ### file -> skill index
-
-| File                                  | Skill(s) to update                                |
-| ------------------------------------- | ------------------------------------------------- |
-| `.github/skills/**`                   | `nvim-skill-maintenance`                          |
-| `after/queries/**/*.scm`              | `nvim-treesitter`                                 |
-| `init.lua`                            | `nvim-config-overview`                            |
-| `lua/config/autocmds.lua`             | `nvim-core-options-keymaps-autocmds`              |
-| `lua/config/keymaps.lua`              | `nvim-core-options-keymaps-autocmds`              |
-| `lua/config/lsp.lua`                  | `nvim-lsp`                                        |
-| `lua/config/options.lua`              | `nvim-core-options-keymaps-autocmds`              |
-| `lua/config/pack.lua`                 | `nvim-config-overview`, `nvim-pack-management`, `nvim-tree-sitter-manager` |
-| `lua/plugins/99.lua`                  | `nvim-99`                                         |
-| `lua/plugins/bufferline.lua`          | `nvim-misc-plugins`                               |
-| `lua/plugins/colorizer.lua`           | `nvim-misc-plugins`                               |
-| `lua/plugins/colorscheme.lua`         | `nvim-colorscheme`                                |
-| `lua/plugins/completion.lua`          | `nvim-blink-cmp`                                  |
-| `lua/plugins/conform.lua`             | `nvim-conform`                                    |
-| `lua/plugins/fidget.lua`              | `nvim-misc-plugins`                               |
-| `lua/plugins/flash.lua`               | `nvim-flash`                                      |
-| `lua/plugins/gitsigns.lua`            | `nvim-gitsigns`                                   |
-| `lua/plugins/jdtls.lua`               | `nvim-jdtls`                                      |
-| `lua/plugins/js-i18n.lua`             | `nvim-misc-plugins`                               |
-| `lua/plugins/lint.lua`                | `nvim-lint`                                       |
-| `lua/plugins/lualine.lua`             | `nvim-lualine`                                    |
-| `lua/plugins/mason.lua`               | `nvim-mason`                                      |
-| `lua/plugins/minesweeper.lua`         | `nvim-misc-plugins`                               |
-| `lua/plugins/mini.lua`                | `nvim-mini`                                       |
-| `lua/plugins/neo-tree.lua`            | `nvim-neo-tree`                                   |
-| `lua/plugins/octo.lua`                | `nvim-octo`                                       |
-| `lua/plugins/render-markdown.lua`     | `nvim-render-markdown`                            |
-| `lua/plugins/snacks.lua`              | `nvim-snacks`                                     |
-| `lua/plugins/telescope.lua`           | `nvim-telescope`                                  |
-| `lua/plugins/tmux-navigator.lua`      | `nvim-misc-plugins`                               |
-| `lua/plugins/treesitter-textobjects.lua` | `nvim-treesitter`                              |
-| `lua/plugins/trouble.lua`             | `nvim-trouble`                                    |
-| `lua/plugins/tree-sitter-manager.lua` | `nvim-tree-sitter-manager`                        |
-| `lua/plugins/whichkey.lua`            | `nvim-which-key`                                  |
-| `lua/util/ai_argument.lua`            | `nvim-mini`                                       |
-| `lua/util/ai_treesitter.lua`          | `nvim-mini`, `nvim-treesitter`                    |
-| `lua/util/lsp_definition.lua`         | `nvim-jdtls`, `nvim-lsp`                          |
-| `lua/util/path.lua`                   | `nvim-gitsigns`, `nvim-lualine`, `nvim-telescope` |
-| `nvim-pack-lock.json`                 | `nvim-pack-management`                            |
+| File                                   | Skill(s) to update |
+| -------------------------------------- | ------------------ |
+| `.github/skills/**`                      | `nvim-skill-maintenance` |
+| `after/queries/**/*.scm`                 | `nvim-treesitter` |
+| `init.lua`                               | `nvim-config-overview` |
+| `lua/config/autocmds.lua`                | `nvim-core-options-keymaps-autocmds` |
+| `lua/config/keymaps.lua`                 | `nvim-core-options-keymaps-autocmds` |
+| `lua/config/lsp.lua`                     | `nvim-lsp` |
+| `lua/config/options.lua`                 | `nvim-core-options-keymaps-autocmds` |
+| `lua/config/pack.lua`                    | `nvim-config-overview`, `nvim-pack-management`, `nvim-tree-sitter-manager` |
+| `lua/plugins/99.lua`                     | `nvim-99` |
+| `lua/plugins/bufferline.lua`             | `nvim-misc-plugins` |
+| `lua/plugins/colorizer.lua`              | `nvim-misc-plugins` |
+| `lua/plugins/colorscheme.lua`            | `nvim-colorscheme` |
+| `lua/plugins/completion.lua`             | `nvim-blink-cmp` |
+| `lua/plugins/conform.lua`                | `nvim-conform` |
+| `lua/plugins/fidget.lua`                 | `nvim-misc-plugins` |
+| `lua/plugins/flash.lua`                  | `nvim-flash` |
+| `lua/plugins/gitsigns.lua`               | `nvim-gitsigns` |
+| `lua/plugins/jdtls.lua`                  | `nvim-jdtls` |
+| `lua/plugins/js-i18n.lua`                | `nvim-misc-plugins` |
+| `lua/plugins/lint.lua`                   | `nvim-lint` |
+| `lua/plugins/lualine.lua`                | `nvim-lualine` |
+| `lua/plugins/mason.lua`                  | `nvim-mason` |
+| `lua/plugins/minesweeper.lua`            | `nvim-misc-plugins` |
+| `lua/plugins/mini.lua`                   | `nvim-mini` |
+| `lua/plugins/neo-tree.lua`               | `nvim-neo-tree` |
+| `lua/plugins/octo.lua`                   | `nvim-octo` |
+| `lua/plugins/render-markdown.lua`        | `nvim-render-markdown` |
+| `lua/plugins/snacks.lua`                 | `nvim-snacks` |
+| `lua/plugins/telescope.lua`              | `nvim-telescope` |
+| `lua/plugins/tmux-navigator.lua`         | `nvim-misc-plugins` |
+| `lua/plugins/tree-sitter-manager.lua`    | `nvim-tree-sitter-manager` |
+| `lua/plugins/treesitter-context.lua`     | `nvim-treesitter-context` |
+| `lua/plugins/treesitter-textobjects.lua` | `nvim-treesitter` |
+| `lua/plugins/trouble.lua`                | `nvim-trouble` |
+| `lua/plugins/whichkey.lua`               | `nvim-which-key` |
+| `lua/util/ai_argument.lua`               | `nvim-mini` |
+| `lua/util/ai_treesitter.lua`             | `nvim-mini`, `nvim-treesitter` |
+| `lua/util/lsp_definition.lua`            | `nvim-jdtls`, `nvim-lsp` |
+| `lua/util/path.lua`                      | `nvim-gitsigns`, `nvim-lualine`, `nvim-telescope` |
+| `lua/util/treesitter_indent.lua`         | `nvim-treesitter` |
+| `nvim-pack-lock.json`                    | `nvim-pack-management` |
 
 Note: some files are covered by more than one skill (e.g. `lua/util/path.lua`
 feeds telescope, lualine, and gitsigns). When you edit a shared file, update

@@ -32,6 +32,9 @@ vim.pack.add({
   -- tree-sitter-manager installs parsers + bundles highlight queries.
   { src = "https://github.com/romus204/tree-sitter-manager.nvim" },
 
+  -- Sticky scope context (uses native vim.treesitter; no nvim-treesitter).
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
+
   -- Fuzzy finder
   { src = "https://github.com/nvim-telescope/telescope.nvim" },
   { src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim" },
@@ -121,6 +124,7 @@ local modules = {
   "trouble",
   "whichkey",
   "snacks",
+  "treesitter-context",
   "flash",
   "colorizer",
   "render-markdown",

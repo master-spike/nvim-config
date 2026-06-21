@@ -129,6 +129,7 @@ don't duplicate.
 - `nvim-lsp` — native LSP, mason, adding servers.
 - `nvim-treesitter` — native treesitter, textobject queries, the make-range
   resolver, and `after/queries` overrides (nvim-treesitter itself was removed).
+- `nvim-treesitter-context` — sticky scope header.
 - One skill per plugin: `nvim-telescope`, `nvim-blink-cmp`, `nvim-conform`,
   `nvim-lint`, `nvim-mini`, `nvim-gitsigns`, `nvim-lualine`, `nvim-neo-tree`,
   `nvim-snacks`, `nvim-trouble`, `nvim-which-key`, `nvim-flash`, `nvim-octo`,

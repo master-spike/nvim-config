@@ -19,6 +19,7 @@ wk.add({
   { "<leader>uf", desc = "Toggle formatter (buffer)" },
   { "<leader>uF", desc = "Toggle formatter (global)" },
   { "<leader>ut", desc = "Toggle translations" },
+  { "<leader>uc", desc = "Toggle treesitter context" },
 })
 
 -- Describe mini.ai text objects so they appear in which-key after the
