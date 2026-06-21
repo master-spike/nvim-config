@@ -31,65 +31,49 @@ Ground truth:
 
 ## What's configured
 
-This is the real setup in `lua/plugins/mini.lua`:
+`lua/plugins/mini.lua` sets up the three modules. Read the file for the exact
+custom-textobject id → capture map and the surround keys; the durable structure:
+
+**`mini.ai`** — default textobjects plus a set of custom ids in
+`custom_textobjects`, each built from a resolver rather than inline logic:
 
 ```lua
 local ai = require("mini.ai")
 local argument = require("util.ai_argument").spec
--- make-range-aware treesitter resolver (NOT ai.gen_spec.treesitter)
-local treesitter = require("util.ai_treesitter").spec
+local treesitter = require("util.ai_treesitter").spec  -- make-range-aware (NOT ai.gen_spec.treesitter)
 
 ai.setup({
   n_lines = 500,
   custom_textobjects = {
-    a = argument,
+    a = argument,                                                  -- argument/parameter
     f = treesitter({ a = "@function.outer", i = "@function.inner" }),
-    c = treesitter({ a = "@class.outer", i = "@class.inner" }),
-    d = treesitter({ a = "@statement.outer", i = "@statement.outer" }),
-    m = treesitter({ a = "@call.outer", i = "@call.inner" }),
-    o = treesitter({
-      a = { "@block.outer", "@conditional.outer", "@loop.outer" },
-      i = { "@block.inner", "@conditional.inner", "@loop.inner" },
-    }),
+    -- c/d/m/o similarly map an id to treesitter captures; read the file for the set
   },
 })
-
-require("mini.surround").setup({
-  mappings = {
-    add = "gsa",      -- Add surrounding
-    delete = "gsd",   -- Delete surrounding
-    find = "gsf",     -- Find surrounding
-    find_left = "gsF", -- Find left surrounding
-    highlight = "gsh", -- Highlight surrounding
-    replace = "gsr",  -- Replace surrounding
-  },
-})
-require("mini.icons").setup()
 ```
 
-`mini.ai` uses default mappings plus these custom object ids:
+The pattern that matters: custom ids are produced by `util.ai_argument.spec`
+(the argument object) and `util.ai_treesitter.spec` (function/class/statement/
+call/block-style objects from treesitter captures). To add or change an object,
+edit the `custom_textobjects` map — don't write bespoke selection logic.
 
-```text
-aa / ia  argument or parameter, from util.ai_argument.spec
-af / if  function, from @function.outer and @function.inner
-ac / ic  class, from @class.outer and @class.inner
-ad / id  statements or declarations, from @statement.outer
-am / im  method/function calls, from @call.outer and @call.inner
-ao / io  block, conditional, or loop captures
-```
+**`mini.surround`** — remapped to a **`gs` prefix** (`gsa`/`gsd`/`gsr`/`gsf`/
+`gsF`/`gsh`) instead of the default `s` prefix. This is deliberate: it avoids
+clashing with Flash and Vim's `s` substitute. Keep the `gs` prefix.
 
-`af / if  function, from @function.outer and @function.inner
-ac / ic  class, from @class.outer and @class.inner
-ao / io  block, conditional, or loop captures` are resolved by
-`lua/util/ai_treesitter.lua` (a make-range-aware resolver), NOT by
-`ai.gen_spec.treesitter`. See `nvim-treesitter` for why: most `*.inner` objects
-are defined upstream via the `#make-range!` directive, which mini.ai's builtin
-resolver cannot see. The custom resolver reads both plain captures and
-make-range metadata, so inner objects work in every language with no
-per-language override.
+**`mini.icons`** — `require("mini.icons").setup()`, defaults only.
 
-`lua/plugins/whichkey.lua` adds descriptions for these ids so which-key can
-show them after `a`, `i`, `an`, `in`, `al`, and `il`. See `nvim-which-key`.
+### Why util.ai_treesitter (not ai.gen_spec.treesitter)
+
+The treesitter-backed ids are resolved by `lua/util/ai_treesitter.lua`, a
+**make-range-aware** resolver, NOT mini.ai's `ai.gen_spec.treesitter`. Most
+`*.inner` objects are defined upstream via the `#make-range!` directive, whose
+range names mini.ai's builtin resolver cannot see; the custom resolver reads both
+plain captures and make-range metadata, so inner objects work in every language
+with no per-language override. See `nvim-treesitter` for the full story.
+
+`lua/plugins/whichkey.lua` adds descriptions for the custom ids so which-key can
+surface them after `a`/`i`/`an`/`in`/`al`/`il`. See `nvim-which-key`.
 
 ## Capabilities + examples
 
@@ -177,18 +161,16 @@ Run from `~/.config/nvim`:
 luac -p lua/plugins/mini.lua lua/util/ai_argument.lua lua/util/ai_treesitter.lua
 nvim --headless -u init.lua -c 'lua
   local ai = require("mini.ai")
-  assert(ai.config.n_lines == 500)
-  assert(type(ai.config.custom_textobjects.a) == "function")
-  assert(type(ai.config.custom_textobjects.f) == "function")
-  assert(type(ai.config.custom_textobjects.d) == "function")
-  assert(type(ai.config.custom_textobjects.m) == "function")
-  assert(type(ai.config.custom_textobjects.o) == "function")
+  assert(type(ai.config.n_lines) == "number")
+  -- the custom-object PATTERN: ids resolve to resolver functions. Check the two
+  -- stable ones (argument + function); the rest of the set may change.
+  assert(type(ai.config.custom_textobjects.a) == "function", "argument object missing")
+  assert(type(ai.config.custom_textobjects.f) == "function", "function object missing")
   assert(type(require("mini.surround").config) == "table")
   assert(type(require("mini.icons")) == "table")
-  -- Verify gs prefix surround mappings
+  -- surround uses the gs prefix (the deliberate, durable choice):
   assert(vim.fn.maparg("gsa", "n") ~= "", "gsa should be mapped")
   assert(vim.fn.maparg("gsd", "n") ~= "", "gsd should be mapped")
-  assert(vim.fn.maparg("gsr", "n") ~= "", "gsr should be mapped")
   print("PASS mini")
 ' -c 'qa!' 2>&1 | grep -v tbl_flatten
 ```

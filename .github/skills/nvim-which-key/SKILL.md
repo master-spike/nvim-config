@@ -72,9 +72,10 @@ wk.add({
 ## Practical guidance
 
 - Prefer `wk.add()` when you want labels for prefixes or virtual mappings.
-- `lua/plugins/whichkey.lua` also adds virtual labels for mini.ai's custom
-  `d` (statement/declaration) and `m` (method/function call) object ids so
-  the around/inside prefixes can surface them in the popup.
+- `lua/plugins/whichkey.lua` also registers virtual labels for mini.ai's custom
+  textobject ids (e.g. statement/method-call objects) so the around/inside
+  prefixes surface them in the popup — read that file for the current set and see
+  `nvim-mini`.
 - Use real mappings and descriptions when possible; which-key can display those
   automatically.
 - If you need discoverability for a custom workflow, consider a dedicated keymap

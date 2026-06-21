@@ -38,28 +38,24 @@ API; binaries = Mason. They are separate concerns.
 3. **LspAttach autocmd** — buffer-local keymaps + inlay hints, set when any
    server attaches (details below).
 4. **Per-server overrides** — `vim.lsp.config("<name>", {...})` blocks that
-   override only what's needed (vacuum, yamlls, lua_ls, eslint, vtsls).
+   override only what's needed for specific servers (read the file for which).
 5. **Enable list** — `vim.lsp.enable({...})` names every active server.
 
 ## LspAttach: keymaps + inlay hints
 On attach (`config_lsp_attach` augroup) it enables inlay hints for servers that
-support them, then sets buffer-local `n`-mode maps. Navigation uses **Telescope
-pickers** so results land in the picker (and `<C-q>` → quickfix):
-```
-gd  -> util.lsp_definition.goto_definition  (Telescope lsp_definitions + Java fix)
-gR  -> telescope.builtin.lsp_references
-gI  -> telescope.builtin.lsp_implementations
-gy  -> telescope.builtin.lsp_type_definitions
-gD  -> vim.lsp.buf.declaration
-K   -> vim.lsp.buf.hover
-<leader>ca -> vim.lsp.buf.code_action
-<leader>cr -> vim.lsp.buf.rename
-```
-`gd` is special: `util/lsp_definition.lua` nudges the cursor for Java
-`method_reference` nodes (a jdtls SelectionEngine quirk) before delegating to
-Telescope definition picker. Toggle inlay hints with `<leader>uh`
-(`config/keymaps.lua`). Diagnostics nav (`]d`/`[d`, `<leader>cd`) is in
-`keymaps.lua`.
+support them, then sets buffer-local `n`-mode LSP maps. Read `config/lsp.lua` for
+the current keys; the durable conventions:
+
+- Navigation (definition/references/implementations/type-defs) goes through
+  **Telescope pickers** so results land in the picker (and `<C-q>` → quickfix),
+  rather than the raw `vim.lsp.buf.*` jumps. Hover/rename/code-action use
+  `vim.lsp.buf.*` directly.
+- `gd` is special: it goes through `util/lsp_definition.lua`, which nudges the
+  cursor for Java `method_reference` nodes (a jdtls SelectionEngine quirk) before
+  delegating to the Telescope definition picker. Keep that indirection.
+
+Toggle inlay hints with `<leader>uh` (`config/keymaps.lua`). Diagnostics nav
+(`]d`/`[d`, `<leader>cd`) lives in `keymaps.lua`, not here.
 
 ## Add a new language server
 1. Install the binary: add it to `mason-tool-installer`'s `ensure_installed`
@@ -76,18 +72,21 @@ ls ~/.local/share/nvim/site/pack/core/opt/nvim-lspconfig/lsp/        # all serve
 cat ~/.local/share/nvim/site/pack/core/opt/nvim-lspconfig/lsp/lua_ls.lua
 ```
 
-## Per-server settings (examples already in the file)
-- **lua_ls**: declares `vim` and `Snacks` globals, LuaJIT runtime, inlay hints.
-- **vtsls**: enables TS/JS inlay hints via a shared `vtsls_inlay` table.
-- **eslint**: wraps the lspconfig `on_attach` and adds a `BufWritePre`
-  `LspEslintFixAll` (fix-on-save). JS/TS linting is the eslint LSP's job — NOT
-  nvim-lint (see `nvim-lint`).
-- **yamlls**: OpenAPI/Swagger/Arazzo schema associations.
-- **vacuum**: a fully custom server with no lspconfig default — defined inline
-  with explicit `cmd`, `filetypes`, `root_markers`, and a generated ruleset
-  file. This is the template for adding a server lspconfig doesn't know.
+## Per-server settings (patterns to copy)
+The file holds a handful of `vim.lsp.config("<name>", {...})` override blocks —
+read it for the current set. The reusable patterns they demonstrate:
 
-Custom server skeleton:
+- **Declaring globals / runtime** for a server (e.g. lua_ls gets `vim` + `Snacks`
+  globals and LuaJIT runtime so it stops warning about them).
+- **Enabling inlay hints** via a server's settings.
+- **Wrapping lspconfig's `on_attach`** to add behaviour — e.g. a `BufWritePre`
+  fix-on-save for eslint. (JS/TS linting is the eslint LSP's job, NOT nvim-lint —
+  see `nvim-lint`.)
+- **Schema associations** (e.g. yamlls for OpenAPI/Swagger).
+- **A fully custom server** with no lspconfig default, defined inline with
+  explicit `cmd`/`filetypes`/`root_markers` — this is the template for adding a
+  server lspconfig doesn't know:
+
 ```lua
 vim.lsp.config("myserver", {
   cmd = { "myserver", "--stdio" },

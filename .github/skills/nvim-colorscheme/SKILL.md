@@ -26,102 +26,39 @@ names, setup keys, or theme-switching steps. Read `:help material.nvim`,
 
 ## What's configured
 
-Real load order in `lua/plugins/colorscheme.lua`:
+`lua/plugins/colorscheme.lua` wires Material in a strict order (the order is the
+durable part — the individual option values are not, read the file for those):
 
 ```lua
-vim.g.material_style = "darker"
+vim.g.material_style = "darker"          -- 1. style BEFORE setup/colorscheme
 local material = require("material")
 local material_colors = require("material.colors")
 
 material.setup({
-  contrast = {
-    terminal = false,
-    sidebars = false,
-    floating_windows = false,
-    cursor_line = false,
-    lsp_virtual_text = false,
-    non_current_windows = false,
-    filetypes = {},
-  },
-  styles = {
-    comments = { italic = true },
-    strings = { italic = true },
-    keywords = {},
-    functions = {},
-    variables = {},
-    operators = {},
-    types = { bold = true },
-  },
-  plugins = {
-    "blink",
-    "fidget",
-    "flash",
-    "gitsigns",
-    "mini",
-    "neo-tree",
-    "nvim-web-devicons",
-    "telescope",
-    "trouble",
-    "which-key",
-  },
-  disable = {
-    colored_cursor = false,
-    borders = false,
-    background = false,
-    term_colors = false,
-    eob_lines = false,
-  },
-  high_visibility = {
-    lighter = false,
-    darker = false,
-  },
-  lualine_style = "default",
-  async_loading = false,
-  custom_colors = nil,
-  custom_highlights = {
-    LspInlayHint = {
-      bg = "#323232",
-      fg = "#D0D8E0",
-      italic = true,
-    },
-    Keyword = { fg = material_colors.main.orange },
-    ["@keyword"] = { fg = material_colors.main.orange },
-    ["@keyword.builtin"] = { fg = material_colors.main.orange },
-    ["@type.qualifier"] = { fg = material_colors.main.orange },
-    ["@attribute"] = { fg = material_colors.main.purple },
-    ["@attribute.builtin"] = { fg = material_colors.main.purple },
-    ["@property"] = { fg = material_colors.editor.fg },
-    ["@lsp.type.interface"] = { link = "@type" },
-    Pmenu = { bg = material_colors.editor.bg_alt },
-    PmenuSel = { bg = material_colors.editor.active },
-    BlinkCmpMenu = { bg = material_colors.editor.bg_alt },
-    BlinkCmpMenuBorder = {
-      fg = material_colors.editor.border,
-      bg = material_colors.editor.bg_alt,
-    },
-    BlinkCmpMenuSelection = { bg = material_colors.editor.active },
-    WhichKeyFloat = { bg = material_colors.editor.bg_alt },
-    WhichKeyBorder = {
-      fg = material_colors.editor.border,
-      bg = material_colors.editor.bg_alt,
-    },
-    TelescopeResultsFileName = { fg = material_colors.main.orange },
-  },
+  -- contrast / styles / plugins allowlist / disable / custom_highlights ...
+  custom_highlights = { ... },           -- 2. theme-owned overrides go here
 })
 
-vim.cmd.colorscheme("material")
+vim.cmd.colorscheme("material")          -- 3. apply the theme
 
-vim.api.nvim_set_hl(0, "WhichKeyFloat", {
-  bg = material_colors.editor.bg_alt,
-})
-vim.api.nvim_set_hl(0, "WhichKeyBorder", {
-  fg = material_colors.editor.border,
-  bg = material_colors.editor.bg_alt,
-})
-vim.api.nvim_set_hl(0, "WhichKeyNormal", {
-  bg = material_colors.editor.bg_alt,
-})
+vim.api.nvim_set_hl(0, "WhichKey*", { ... }) -- 4. volatile overrides AFTER apply
 ```
+
+What each part is for:
+
+- **`vim.g.material_style`** — the active style (e.g. `darker`). Set before setup.
+- **`material.setup({...})`** — Material's options: a `plugins` allowlist of
+  integrations, `styles`/`contrast`/`disable` toggles, and `custom_highlights`
+  for any highlight group the theme should own (Treesitter/LSP/cmp/which-key
+  groups, plus the `TelescopeResultsFileName` group that `nvim-telescope`'s
+  `path_display` colours). Verify any option/plugin name against
+  `doc/material.nvim.txt` before adding it.
+- **`vim.cmd.colorscheme("material")`** — applies the theme; must come after setup.
+- **trailing `vim.api.nvim_set_hl(...)`** — a few WhichKey float groups are
+  re-applied *after* `:colorscheme` because applying a theme resets them.
+
+Read `lua/plugins/colorscheme.lua` for the exact option values, the integration
+allowlist, and the current `custom_highlights` map — don't assume them here.
 
 ## Load-order rules
 
@@ -201,7 +138,7 @@ Run from `~/.config/nvim`:
 ```bash
 luac -p lua/plugins/colorscheme.lua
 nvim --headless -u init.lua -c 'lua
-  assert(vim.g.material_style == "darker")
+  assert(type(vim.g.material_style) == "string" and vim.g.material_style ~= "")
   assert(vim.g.colors_name == "material")
   local colors = require("material.colors")
   assert(type(colors.editor.bg_alt) == "string")

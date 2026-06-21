@@ -25,37 +25,33 @@ plugin. They are required by `init.lua` in order: `options` → `keymaps` →
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 ```
-Everything else is plain `vim.opt`. Current notable settings (read the file for
-the full list — don't assume):
-- Indent: `expandtab`, `shiftwidth=2`, `tabstop=2`, `softtabstop=2`,
-  `smartindent`, `shiftround`.
-- Search: `ignorecase`, `smartcase`, `inccommand="nosplit"`.
-- UI: `number`, `relativenumber`, `signcolumn="yes"`, `cursorline`,
-  `termguicolors`, `list` with custom `fillchars`.
-- Files: `undofile`, `swapfile=false`, `updatetime=200`, `timeoutlen=300`.
-- `clipboard="unnamedplus"` (yank/paste use the system clipboard).
-- Uses `rg` for `grepprg` when `rg` is on PATH.
+Everything else is plain `vim.opt.<name> = <value>`. Read the file for the live
+settings rather than assuming — the durable points are: leader is set before any
+keymap; indentation/search/UI/file behaviour are set via `vim.opt`; the system
+clipboard is used; and `grepprg` switches to `rg` when `rg` is on `PATH`.
 
 To change an option: edit this file, keep the `opt.<name> = <value>` style.
 
 ## keymaps.lua — global `vim.keymap.set`
-`lua/config/keymaps.lua`. Convention: `local map = vim.keymap.set`, and **every
-mapping gets a `desc`** (which-key shows it). Examples already present:
-```lua
-map("n", "<leader>wd", "<C-W>c", { desc = "Delete window" })
-map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-map("n", "<leader>uh", function() ... end, { desc = "Toggle inlay hints" })
-```
-Notes / conventions:
-- Prefix groups: `<leader>w` window, `<leader>b` buffer, `<leader>u` UI toggles,
-  `<leader>c` code/diagnostics, `<leader>q` quit. Group labels are declared in
-  which-key (see `nvim-which-key`).
-- `<C-h/j/k/l>` are NOT defined here — they belong to vim-tmux-navigator
+`lua/config/keymaps.lua`. The durable conventions (not the specific keys — read
+the file for those):
+- `local map = vim.keymap.set`, and **every mapping gets a `desc`** so which-key
+  can show it.
+- Use a Lua function (not a string) for anything non-trivial; keep `desc`.
+- Leader **prefix groups** are organised by purpose (window / buffer / UI toggles
+  / code-diagnostics / quit, etc.); the group *labels* are declared in which-key
+  (see `nvim-which-key`). Follow the existing grouping when adding a map.
+- An `expr` map example to copy for count-aware motions:
+  ```lua
+  map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+  ```
+
+Scope rules (these are the load-bearing part):
+- `<C-h/j/k/l>` are **not** defined here — they belong to vim-tmux-navigator
   (`nvim-misc-plugins`). Don't redefine them.
 - **Plugin-specific keymaps live in that plugin's `lua/plugins/<x>.lua`**, not
   here. Only global/editor maps go in `keymaps.lua`. LSP maps live in
   `config/lsp.lua` (buffer-local, on `LspAttach`).
-- Use a Lua function (not a string) for anything non-trivial; keep `desc`.
 
 ## autocmds.lua — `vim.api.nvim_create_autocmd`
 `lua/config/autocmds.lua`. Uses a local helper so every group is namespaced and
@@ -88,11 +84,11 @@ house style for autocmds owned by a specific module.
 cd ~/.config/nvim
 luac -p lua/config/options.lua   # (and keymaps.lua / autocmds.lua)
 nvim --headless -u init.lua -c 'qa!'                       # loads clean?
-# Option took effect:
+# Option took effect (substitute the option you changed):
 nvim --headless -u init.lua -c 'lua print(vim.o.shiftwidth)' -c 'qa!'
-# Keymap is defined (non-empty rhs/callback):
-nvim --headless -u init.lua -c 'lua print(vim.fn.maparg("<leader>wd","n"))' -c 'qa!'
-# Autocmd group exists:
+# A keymap is defined (substitute the lhs you added; non-empty == defined):
+nvim --headless -u init.lua -c 'lua print(vim.fn.maparg("<leader>w","n"))' -c 'qa!'
+# An autocmd group exists (substitute the augroup name you used):
 nvim --headless -u init.lua \
   -c 'lua print(#vim.api.nvim_get_autocmds({ group = "config_highlight_yank" }))' \
   -c 'qa!'

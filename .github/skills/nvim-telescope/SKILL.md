@@ -20,32 +20,33 @@ Fuzzy finder. Configured in `lua/plugins/telescope.lua`, with two extensions:
 shortening lives in `lua/util/path.lua` (see `nvim-config-overview`).
 
 ## What's configured
+`telescope.setup({ defaults = {...}, extensions = {...} })`, then both extensions
+are loaded under `pcall` so a missing/unbuilt one doesn't break startup. Read
+`lua/plugins/telescope.lua` for the exact defaults; the parts that matter:
+
+- **`defaults.path_display` is a function** `(opts, path) -> string, style?` — the
+  one hook that rewrites the displayed path for **every** picker (see the pattern
+  section below). This is the most important thing in the file.
+- **Two extensions:** `fzf` (compiled native sorter — `pack.lua` runs `make` if
+  `build/libfzf.so` is missing) and `ui-select` (routes `vim.ui.select` through a
+  telescope dropdown). Loaded via `pcall(telescope.load_extension, ...)`.
+
 ```lua
 telescope.setup({
   defaults = {
-    layout_strategy = "horizontal",
-    layout_config = { prompt_position = "top" },
-    sorting_strategy = "ascending",
-    winblend = 0,
+    -- layout/sorting/winblend ...
     path_display = function(_, path)
-      -- returns (string, style); style colours the filename component
       local collapsed = require("util.path").collapse(path)
       local filename = collapsed:match("[^/]+$") or collapsed
       local start = #collapsed - #filename
       return collapsed, { { { start, #collapsed }, "TelescopeResultsFileName" } }
     end,
   },
-  extensions = {
-    fzf = {},
-    ["ui-select"] = { require("telescope.themes").get_dropdown({}) },
-  },
+  extensions = { fzf = {}, ["ui-select"] = { require("telescope.themes").get_dropdown({}) } },
 })
 pcall(telescope.load_extension, "fzf")
 pcall(telescope.load_extension, "ui-select")
 ```
-Extensions are loaded under `pcall` so a missing/unbuilt extension doesn't break
-startup. fzf-native needs its C lib built — `pack.lua` runs `make` if
-`build/libfzf.so` is absent.
 
 ## The path_display pattern (IMPORTANT — reuse, don't reinvent)
 `path_display` is a **documented telescope default** that can be a function
@@ -92,19 +93,14 @@ ever need them, are in `telescope.make_entry` (`gen_from_file`,
 `gen_from_vimgrep`), and `utils.transform_path` is what calls `path_display`.
 
 ## Keymaps (defined in telescope.lua)
-```
-<leader><space> / <leader>ff  find_files (custom wrapper)
-<leader>f/ , <leader>sg        live_grep  (custom wrapper)
-<leader>fb                     buffers
-<leader>fh                     help_tags
-<leader>fr                     oldfiles
-<leader>sk                     keymaps
-```
-`<leader>ff` and `<leader>f/` are bound to **local wrapper functions**
-(`find_files` / `live_grep` in telescope.lua), NOT `builtin.*`, because they add
-the `<C-y>` toggle below. The other maps still use `builtin.*`.
+A `<leader>f…`/`<leader>s…` family of picker maps lives in `telescope.lua` — read
+the file for the current set. The durable distinction: `find_files` and
+`live_grep` are bound to **local wrapper functions** (defined in `telescope.lua`),
+NOT `builtin.*` directly, because they add the include-ignored toggle below; the
+other maps use `builtin.*`.
+
 Add a plain picker keymap: `map("n", "<leader>fX", builtin.<picker>, {desc=...})`.
-List real builtin pickers:
+List real builtin pickers (don't guess names):
 ```bash
 nvim --headless -u init.lua \
   -c 'lua print(vim.inspect(vim.tbl_keys(require("telescope.builtin"))))' -c 'qa!'

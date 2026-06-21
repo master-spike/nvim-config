@@ -29,113 +29,48 @@ Ground truth:
 
 ## What's configured
 
-`gitsigns.setup({ on_attach = function(bufnr) ... end })` defines buffer-local
-maps for buffers that gitsigns attaches to:
+`gitsigns.setup({ on_attach = function(bufnr) ... end })`. Almost everything is
+wired in the `on_attach` callback, so the gitsigns action maps are **buffer-local
+and only exist after gitsigns attaches** to a git-backed buffer. Read
+`lua/plugins/gitsigns.lua` for the current key list — the durable conventions are:
 
-```lua
-map("n", "]h", nav_next_hunk, { desc = "Next hunk" })
-map("n", "[h", nav_prev_hunk, { desc = "Prev hunk" })
+- Hunk navigation on `]h` / `[h`.
+- A `<leader>g…` family for git actions: `<leader>gh…` for per-hunk
+  stage/reset/preview (these also take a visual range when called from visual
+  mode), buffer-wide stage/reset, blame, diff, quickfix export, and `<leader>gt…`
+  for the blame/word-diff toggles.
 
-map("n", "<leader>ghs", gitsigns.stage_hunk)
-map("n", "<leader>ghr", gitsigns.reset_hunk)
-map("v", "<leader>ghs", function()
-  gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-end)
-map("v", "<leader>ghr", function()
-  gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-end)
-
-map("n", "<leader>gS", gitsigns.stage_buffer)
-map("n", "<leader>gR", gitsigns.reset_buffer)
-map("n", "<leader>ghp", gitsigns.preview_hunk_inline)
-map("n", "<leader>gb", function()
-  gitsigns.blame_line({ full = true })
-end)
-map("n", "<leader>gd", gitsigns.diffthis)
-map("n", "<leader>gD", function()
-  gitsigns.diffthis("~")
-end)
-map("n", "<leader>gQ", function()
-  gitsigns.setqflist("all")
-end)
-map("n", "<leader>gq", gitsigns.setqflist)
-map("n", "<leader>gtb", gitsigns.toggle_current_line_blame)
-map("n", "<leader>gtw", gitsigns.toggle_word_diff)
-```
-
-Navigation falls back to built-in `]h` or `[h` with `vim.cmd.normal(...)` when
-`vim.wo.diff` is true. Otherwise it calls `gitsigns.nav_hunk("next")` or
-`gitsigns.nav_hunk("prev")`.
+Navigation has a deliberate fallback: when `vim.wo.diff` is true it runs the
+built-in `]h`/`[h` via `vim.cmd.normal(...)`; otherwise it calls
+`gitsigns.nav_hunk("next"|"prev")`. Keep that branch if you touch hunk nav.
 
 ## Custom Telescope hunk picker
 
-`<leader>fg` is a global map with desc `Find git hunks (Telescope)`. It is not
-a gitsigns default. It is implemented in `lua/plugins/gitsigns.lua` after
-`gitsigns.setup(...)`.
+`<leader>fg` (global, desc `Find git hunks (Telescope)`) is **not** a gitsigns
+default — it's a custom picker implemented in `lua/plugins/gitsigns.lua` after
+`gitsigns.setup(...)`. Understand the mechanism rather than the exact code:
 
-Flow:
+- It calls `gitsigns.setqflist("all", { open = false }, cb)` to enumerate every
+  hunk in the repo, then builds a Telescope picker (`pickers.new` +
+  `finders.new_table`) from the quickfix items.
+- **Why a custom previewer:** `setqflist` entries carry location (file/line/text)
+  but **no diff body**. So the previewer re-runs `git --no-pager -c
+  color.ui=never diff -U0` for the selected file, parses the `@@` hunks, and shows
+  the hunk covering `lnum` (or the nearest) in a `diff`-filetype buffer.
+- Entry display reuses `require("util.path").collapse(...)` so paths shorten the
+  same way as Telescope defaults and lualine. See `nvim-telescope` and
+  `nvim-lualine`.
 
-```lua
-require("gitsigns").setqflist("all", { open = false }, function()
-  vim.schedule(function()
-    local items = vim.fn.getqflist({ items = 0 }).items
-    -- build entries from bufnr / filename / lnum / text
-    local previewer = previewers.new_buffer_previewer({
-      title = "Hunk Diff",
-      define_preview = function(self, entry)
-        local lines = hunk_diff_lines(entry.filename, entry.lnum)
-        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
-        vim.bo[self.state.bufnr].filetype = "diff"
-      end,
-    })
-    pickers.new({}, {
-      prompt_title = "Git Hunks",
-      finder = finders.new_table({
-        results = entries,
-        entry_maker = function(item)
-          local rel = vim.fn.fnamemodify(item.filename, ":.")
-          local minified = path_util.collapse(rel)
-          return {
-            ordinal = rel .. " " .. item.text,
-            display = minified .. " │ " .. item.text,
-            filename = item.filename,
-            lnum = item.lnum,
-            col = 1,
-          }
-        end,
-      }),
-      sorter = conf.generic_sorter({}),
-      previewer = previewer,
-    }):find()
-  end)
-end)
-```
-
-`hunk_diff_lines(filename, lnum)` runs `git -C <dir> --no-pager -c
-color.ui=never diff -U0` and parses `@@` hunks. It returns the diff hunk that
-covers `lnum`, or the nearest hunk. The preview buffer filetype is `diff`.
-
-Path display uses `require("util.path").collapse(rel)`. This is the same helper
-used by Telescope defaults and lualine. See `nvim-telescope` and `nvim-lualine`.
+This is the worked example to copy when you need a custom Telescope picker over
+ad-hoc data — see `nvim-telescope` for the general pattern.
 
 ## Capabilities + examples
 
-```text
-]h / [h          next / previous hunk
-<leader>ghs      stage hunk, visual range in visual mode
-<leader>ghr      reset hunk, visual range in visual mode
-<leader>gS       stage buffer
-<leader>gR       reset buffer
-<leader>ghp      preview hunk inline
-<leader>gb       blame current line, full=true
-<leader>gd       diffthis
-<leader>gD       diffthis("~")
-<leader>gQ       send all hunks to quickfix
-<leader>gq       send attached-buffer hunks to quickfix
-<leader>gtb      toggle current line blame
-<leader>gtw      toggle word diff
-<leader>fg       open the custom Telescope git-hunks picker
-```
+Read the `on_attach` map list in `lua/plugins/gitsigns.lua` for current keys.
+The shape: `]h`/`[h` navigate; `<leader>gh{s,r,p}` act on the hunk under the
+cursor (or the visual selection); buffer-wide stage/reset, blame, diff, and
+quickfix export live under `<leader>g…`; `<leader>gt…` toggles blame/word-diff;
+`<leader>fg` opens the custom git-hunks picker.
 
 ## Gotchas / version notes
 

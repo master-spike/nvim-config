@@ -21,16 +21,12 @@ packer. Everything lives in `lua/config/pack.lua`. Plugins are cloned to
 `pack.lua` does two things, in order:
 
 1. **Install** via `vim.pack.add({ ... })` — a list of `{ src = "<git url>" }`
-   specs:
+   specs (these are illustrative; read `pack.lua` for the live list):
    ```lua
    vim.pack.add({
-     { src = "https://github.com/nvim-telescope/telescope.nvim" },
-     { src = "https://github.com/saghen/blink.cmp", version = "v1.6.0" },
-     { src = "https://github.com/romus204/tree-sitter-manager.nvim" },
-     {
-       src = "https://github.com/nvim-neo-tree/neo-tree.nvim",
-       version = vim.version.range("3"),
-     },
+     { src = "https://github.com/owner/repo" },                      -- default branch
+     { src = "https://github.com/owner/repo", version = "v1.6.0" },  -- pinned tag
+     { src = "https://github.com/owner/repo", version = vim.version.range("3") },
    })
    ```
 

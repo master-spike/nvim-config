@@ -17,14 +17,44 @@ The `.github/skills/` pack is a set of grounded notes about this config. It is a
 **secondary source**. It only stays useful if every config change updates the
 matching skill in the SAME change. This skill is the contract for doing that.
 
+## What a skill is for (durable guidance, NOT a config mirror)
+
+A skill exists to teach a weaker agent **how a plugin/subsystem works** and to
+give the **contextual guidance and gotchas** that aren't obvious from the code —
+so it can make a correct change after reading the *real* config. A skill is
+**not** a second copy of the config. The config file is always the source of
+truth for exact values; the skill points at it.
+
+Write skills to be **durable** — they should survive the user editing keymaps,
+option values, and formatter/server lists without needing an edit. Concretely:
+
+- **DO capture:** the role; how it actually works (mechanism, architecture, the
+  *why* behind a non-obvious choice); conventions and patterns to follow; gotchas
+  and API quirks; **where** the real setup/keymaps live (file path + what to look
+  for); how to verify; `:help`/upstream/install path; the **pinned rev** (kept —
+  it is the staleness signal, see Rule 2).
+- **DON'T duplicate (these churn):** verbatim `setup()` dumps, exhaustive keymap
+  tables that just restate the config, exact option values, full filetype→tool or
+  server enumerations. Show at most a *small* illustrative snippet and say "read
+  `lua/plugins/<x>.lua` for the current set" rather than mirroring it.
+
+Rule of thumb: if a one-line config tweak (rename a key, bump a width, add a
+formatter to a list) would force a skill edit, the skill is too specific — make
+it describe the *pattern* instead.
+
 Three rules, one per situation:
 
 ## 1. Editing config -> update the matching skill in the same change
 
 Before you finish ANY edit to a tracked file, look it up in the **file -> skill
-index** below and open that `SKILL.md`. If your change alters anything the skill
-documents (an option, a keymap, a command, a default, a gotcha, a pinned rev),
-update the skill text to match. A change is not done until its skill is correct.
+index** below and open that `SKILL.md`. Update the skill when your change alters
+something the skill **describes** — a mechanism, a convention, a documented
+gotcha, a default behaviour, or the pinned rev. Because skills are durable and
+do **not** enumerate every value (see "What a skill is for"), most value-only
+tweaks — renaming a keymap, bumping an option, adding one more formatter/server
+to a list — should need **no** skill edit. But if you change *how* something
+works, or invalidate a gotcha or pattern the skill teaches, the skill must follow
+in the same change. A change is not done until its skill is still correct.
 
 The mapping is also stored per-skill in each `SKILL.md` frontmatter as a
 `covers:` list. The index below is the reverse view (file -> skill) and is
@@ -126,14 +156,17 @@ definition of done:
    `covers:` list naming the new config file(s).
 3. Body: match the shape and depth of an existing exemplar
    (`nvim-config-overview`, `nvim-testing-and-verification`, `nvim-telescope`):
-   Role; What's configured (a faithful excerpt of the REAL setup/keymaps);
-   Capabilities + examples; Gotchas/version notes (true only); Docs/ground truth
-   (install path + `:help` tag + upstream URL + pinned rev); a runnable "Verify
-   your change" recipe.
+   Role; How it's wired (describe the mechanism and point to where the real
+   setup/keymaps live — a *small* illustrative snippet is fine, a full verbatim
+   dump is not; see "What a skill is for"); Capabilities + examples;
+   Gotchas/version notes (true only); Docs/ground truth (install path + `:help`
+   tag + upstream URL + pinned rev); a runnable "Verify your change" recipe that
+   asserts behaviour/patterns rather than exact churny values.
 4. Ground every claim in the installed source — see
    `nvim-testing-and-verification`. Do not invent options or keymaps.
-5. Add the new skill to the "one skill per plugin" list at the bottom of
-   `nvim-config-overview`.
+5. Add a one-line mention to `nvim-config-overview` only if it helps orientation;
+   that file now points at `ls .github/skills/` for the authoritative list, so you
+   do **not** need to maintain an exhaustive per-plugin enumeration there.
 6. Regenerate the index in this file (below) and confirm the new file appears.
 
 For a SMALL plugin (library dep or trivial game), do NOT make a new skill — add
@@ -141,8 +174,8 @@ a short entry to `nvim-misc-plugins` and list its config file under that skill's
 `covers:` instead.
 
 When a plugin is REMOVED: delete its `.github/skills/nvim-<name>/` dir (or its
-`nvim-misc-plugins` entry), remove it from the overview list, and regenerate the
-index.
+`nvim-misc-plugins` entry), remove any orientation mention in
+`nvim-config-overview`, and regenerate the index.
 
 ## Regenerating the index
 

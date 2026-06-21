@@ -33,9 +33,12 @@ Repo root: `~/.config/nvim` (this is also the git root).
 4. **Always verify your change actually loads and behaves**, with `luac -p` and
    headless Neovim. A change is not done until tested.
 5. **Formatting:** stylua, 2-space indent, column width 120 (`stylua.toml`).
-6. **Keep the skills current.** When you change a config file, update the skill
-   that documents it in the SAME change. `nvim-skill-maintenance` has the
-   file -> skill index and the rules for stale skills and new plugins.
+6. **Keep the skills current — but keep them durable.** When you change a config
+   file, update the skill that documents it in the SAME change. Skills teach
+   *how things work* and point at the config; they do **not** mirror exact
+   keymaps/option values (those churn), so a value-only tweak usually needs no
+   skill edit. `nvim-skill-maintenance` has the durability principle, the
+   file -> skill index, and the rules for stale skills and new plugins.
 
 ## Load order (init.lua)
 `init.lua` requires five modules **in this exact order**:
@@ -105,19 +108,16 @@ Reverse the above: delete the `vim.pack.add` entry, delete
 `nvim-pack-lock.json`.
 
 ## util/ helpers (shared code lives here, not inline)
-- `util/path.lua` — `collapse(filepath)` shortens a path by replacing each
-  directory whose parent has exactly one subdirectory with `...` (deduped). Used
-  by `lualine`, `telescope` (`path_display`), and the `gitsigns` hunks picker so
-  all three shorten paths identically. Memoized via `vim.uv.fs_scandir`.
-- `util/lsp_definition.lua` — `goto_definition` used by the `gd` LSP keymap.
-- `util/ai_argument.lua` — treesitter `@parameter.inner` argument textobject for
-  mini.ai (the `aa`/`ia` object). See `nvim-mini`.
-- `util/ai_treesitter.lua` — make-range-aware treesitter resolver for mini.ai's
-  `f`/`c`/`o` textobjects (replaces `ai.gen_spec.treesitter`). See
-  `nvim-treesitter`.
-
-When logic is needed in more than one place, add it to `util/` and `require` it;
-don't duplicate.
+Shared logic lives in `lua/util/*.lua` (each returns a table). Current helpers
+include path collapsing (used by lualine/telescope/gitsigns), an LSP `gd` handler,
+and the mini.ai argument + make-range textobject resolvers — but read the
+directory for the live set rather than trusting this list:
+```bash
+ls lua/util/
+```
+The durable rule: when logic is needed in more than one place, add it to `util/`
+and `require` it; don't duplicate. See the relevant per-subsystem skill
+(`nvim-mini`, `nvim-treesitter`, `nvim-telescope`, ...) for what a given helper does.
 
 ## Where to go next (other skills)
 - `nvim-testing-and-verification` — **read this before making changes.** How to
@@ -130,12 +130,13 @@ don't duplicate.
 - `nvim-treesitter` — native treesitter, textobject queries, the make-range
   resolver, and `after/queries` overrides (nvim-treesitter itself was removed).
 - `nvim-treesitter-context` — sticky scope header.
-- One skill per plugin: `nvim-telescope`, `nvim-blink-cmp`, `nvim-conform`,
-  `nvim-lint`, `nvim-mini`, `nvim-gitsigns`, `nvim-lualine`, `nvim-neo-tree`,
-  `nvim-snacks`, `nvim-trouble`, `nvim-which-key`, `nvim-flash`, `nvim-octo`,
-  `nvim-jdtls`, `nvim-render-markdown`, `nvim-mason`,
-  `nvim-tree-sitter-manager`, `nvim-99`, `nvim-colorscheme`, and
-  `nvim-misc-plugins` (the small ones).
+- One skill per substantial plugin (e.g. `nvim-telescope`, `nvim-mini`,
+  `nvim-gitsigns`, `nvim-lsp`, ...), plus `nvim-misc-plugins` for the small ones.
+  For the authoritative, current list, read the skills directory rather than
+  trusting an inline enumeration:
+  ```bash
+  ls .github/skills/
+  ```
 
 ## Verify your change
 Run from the repo root (`~/.config/nvim`):

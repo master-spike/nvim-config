@@ -77,18 +77,26 @@ straight from the upstream queries — **no per-language override needed** for t
 
 ## Query overrides: after/queries/<lang>/textobjects.scm
 
-`after/` files augment (not replace) the upstream query for a language. With the
-make-range-aware resolver, the ONLY overrides still needed are objects upstream
-never defines at all:
+`after/` files augment (not replace) the upstream query for a language. The
+durable rule: with the make-range-aware resolver, the **only** overrides worth
+adding are objects upstream never defines at all for that language. Read the
+`after/queries/<lang>/textobjects.scm` files for the current overrides; as
+examples, this config adds `@block.inner` for C/C++/Java (upstream gives
+`@block.outer` but no inner, so mini.ai's `io` works), and for Java also captures
+record/interface/enum declarations as `@class` and adds `@statement.outer`
+(objects upstream's Java query omits).
 
-- `after/queries/c/textobjects.scm` and `cpp` — add `@block.inner` for
-  `compound_statement` (upstream gives `@block.outer` but no inner), so mini.ai's
-  `io` works.
-- `after/queries/java/textobjects.scm` — add `@block.inner` for `(block)`, and
-  capture `record`/`interface`/`enum` declarations as `@class` (upstream only
-  captures plain `class_declaration`).
+How to decide whether an override is needed (the reusable method): check whether
+upstream already defines the capture for that language before adding it —
+```bash
+P=~/.local/share/nvim/site/pack/core/opt/nvim-treesitter-textobjects
+grep -rl "@statement.outer" "$P/queries/"      # which langs define it upstream
+```
+If the language is listed, no override is needed. **Never guess node-type names**
+in a query — confirm them against the real parse tree with `:InspectTree`/
+`:Inspect` or a headless parse (see "Verify your change").
 
-Do not re-add `function.inner`/`class.inner` overrides — they are redundant now
+Do not re-add `function.inner`/`class.inner` overrides — they are redundant
 (upstream make-range + the resolver handle them). Keep the user-approved
 `"{" (_)+ @block.inner "}"` form for block captures; do not rewrite it using
 `#make-range!`.
