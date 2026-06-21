@@ -1,6 +1,14 @@
 ; extends
-; Treat records, interfaces and enums as @class so af/if-style class text
-; objects (dac/dic/yac/...) work on them, including innermost when nested.
+; Two things upstream's query does not provide for mini.ai:
+;
+; 1. Records, interfaces and enums are not captured as @class, so ac/ic
+;    (dac/dic/yac/...) ignore them. Capture them like classes.
+; 2. @block.inner: upstream defines @block.outer (and method bodies) but no
+;    block.inner, so `io` (inside block) has nothing to select.
+;
+; function.inner / class.inner for plain classes come from upstream via the
+; #make-range! directive, which util.ai_treesitter resolves, so they need no
+; override here.
 
 (record_declaration
   body: (class_body) @class.inner) @class.outer
@@ -11,20 +19,7 @@
 (enum_declaration
   body: (enum_body) @class.inner) @class.outer
 
-; Plain @function.inner captures. The bundled query only defines
-; function.inner via the `#make-range!` directive, which mini.ai's builtin
-; resolver ignores (directive-only captures aren't in the static capture
-; list), so `yif`/`dif` did nothing. Capturing each body statement as
-; @function.inner makes mini.ai span first..last statement (braces excluded)
-; via its quantified-capture handling.
-(method_declaration
-  body: (block
-    "{"
-    (_)+ @function.inner
-    "}"))
-
-(constructor_declaration
-  body: (constructor_body
-    "{"
-    (_)+ @function.inner
-    "}"))
+(block
+  "{"
+  (_)+ @block.inner
+  "}")

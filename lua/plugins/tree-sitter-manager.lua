@@ -1,5 +1,5 @@
--- Treesitter (master branch classic API)
-require("nvim-treesitter.configs").setup({
+-- Parser installation and query management with tree-sitter-manager.nvim.
+require("tree-sitter-manager").setup({
   ensure_installed = {
     "bash",
     "c",
@@ -17,7 +17,6 @@ require("nvim-treesitter.configs").setup({
     "javascript",
     "json",
     "json5",
-    "jsonc",
     "kotlin",
     "lua",
     "luadoc",
@@ -27,6 +26,7 @@ require("nvim-treesitter.configs").setup({
     "python",
     "query",
     "regex",
+    "rust",
     "terraform",
     "toml",
     "tsx",
@@ -36,9 +36,7 @@ require("nvim-treesitter.configs").setup({
     "yaml",
   },
   auto_install = true,
-  highlight = { enable = true },
-  indent = { enable = true },
+  highlight = true,
 })
 
--- Map .conf files to hocon
 vim.filetype.add({ extension = { conf = "hocon" } })

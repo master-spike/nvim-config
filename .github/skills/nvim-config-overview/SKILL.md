@@ -110,7 +110,11 @@ Reverse the above: delete the `vim.pack.add` entry, delete
   by `lualine`, `telescope` (`path_display`), and the `gitsigns` hunks picker so
   all three shorten paths identically. Memoized via `vim.uv.fs_scandir`.
 - `util/lsp_definition.lua` — `goto_definition` used by the `gd` LSP keymap.
-- `util/ai_argument.lua` — helper for AI plugin argument handling.
+- `util/ai_argument.lua` — treesitter `@parameter.inner` argument textobject for
+  mini.ai (the `aa`/`ia` object). See `nvim-mini`.
+- `util/ai_treesitter.lua` — make-range-aware treesitter resolver for mini.ai's
+  `f`/`c`/`o` textobjects (replaces `ai.gen_spec.treesitter`). See
+  `nvim-treesitter`.
 
 When logic is needed in more than one place, add it to `util/` and `require` it;
 don't duplicate.
@@ -123,12 +127,14 @@ don't duplicate.
 - `nvim-core-options-keymaps-autocmds` — editing options/keymaps/autocmds.
 - `nvim-pack-management` — vim.pack, the lockfile, versions, build steps.
 - `nvim-lsp` — native LSP, mason, adding servers.
-- `nvim-treesitter` — parsers and query overrides.
+- `nvim-treesitter` — native treesitter, textobject queries, the make-range
+  resolver, and `after/queries` overrides (nvim-treesitter itself was removed).
 - One skill per plugin: `nvim-telescope`, `nvim-blink-cmp`, `nvim-conform`,
   `nvim-lint`, `nvim-mini`, `nvim-gitsigns`, `nvim-lualine`, `nvim-neo-tree`,
   `nvim-snacks`, `nvim-trouble`, `nvim-which-key`, `nvim-flash`, `nvim-octo`,
   `nvim-jdtls`, `nvim-render-markdown`, `nvim-mason`,
-  `nvim-99`, `nvim-colorscheme`, and `nvim-misc-plugins` (the small ones).
+  `nvim-tree-sitter-manager`, `nvim-99`, `nvim-colorscheme`, and
+  `nvim-misc-plugins` (the small ones).
 
 ## Verify your change
 Run from the repo root (`~/.config/nvim`):

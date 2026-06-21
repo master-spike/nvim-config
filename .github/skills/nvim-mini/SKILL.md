@@ -8,6 +8,7 @@ description: >-
 covers:
   - lua/plugins/mini.lua
   - lua/util/ai_argument.lua
+  - lua/util/ai_treesitter.lua
 ---
 
 # mini.nvim
@@ -35,20 +36,16 @@ This is the real setup in `lua/plugins/mini.lua`:
 ```lua
 local ai = require("mini.ai")
 local argument = require("util.ai_argument").spec
+-- make-range-aware treesitter resolver (NOT ai.gen_spec.treesitter)
+local treesitter = require("util.ai_treesitter").spec
 
 ai.setup({
   n_lines = 500,
   custom_textobjects = {
     a = argument,
-    f = ai.gen_spec.treesitter({
-      a = "@function.outer",
-      i = "@function.inner",
-    }),
-    c = ai.gen_spec.treesitter({
-      a = "@class.outer",
-      i = "@class.inner",
-    }),
-    o = ai.gen_spec.treesitter({
+    f = treesitter({ a = "@function.outer", i = "@function.inner" }),
+    c = treesitter({ a = "@class.outer", i = "@class.inner" }),
+    o = treesitter({
       a = { "@block.outer", "@conditional.outer", "@loop.outer" },
       i = { "@block.inner", "@conditional.inner", "@loop.inner" },
     }),
@@ -76,6 +73,16 @@ af / if  function, from @function.outer and @function.inner
 ac / ic  class, from @class.outer and @class.inner
 ao / io  block, conditional, or loop captures
 ```
+
+`af / if  function, from @function.outer and @function.inner
+ac / ic  class, from @class.outer and @class.inner
+ao / io  block, conditional, or loop captures` are resolved by
+`lua/util/ai_treesitter.lua` (a make-range-aware resolver), NOT by
+`ai.gen_spec.treesitter`. See `nvim-treesitter` for why: most `*.inner` objects
+are defined upstream via the `#make-range!` directive, which mini.ai's builtin
+resolver cannot see. The custom resolver reads both plain captures and
+make-range metadata, so inner objects work in every language with no
+per-language override.
 
 `lua/plugins/whichkey.lua` adds descriptions for these ids so which-key can
 show them after `a`, `i`, `an`, `in`, `al`, and `il`. See `nvim-which-key`.
@@ -118,9 +125,10 @@ cursor, and expands the around form to include one adjacent comma.
 
 Do not switch it to `@parameter.outer` without testing. The file documents the
 real reason: `@parameter.outer` is defined through `#make-range!` in these
-queries, and nvim-treesitter master on Neovim 0.12 fails to resolve it with the
-native `vim.treesitter` API. `@parameter.inner` is a plain capture and works.
-Read `nvim-treesitter` before editing parser queries or captures.
+queries, whose range name is not in the static capture list, so the native
+`vim.treesitter` query API cannot expose it as a capture. `@parameter.inner` is a
+plain capture and works. Read `nvim-treesitter` before editing parser queries or
+captures.
 
 ## Gotchas / version notes
 
@@ -130,8 +138,10 @@ Read `nvim-treesitter` before editing parser queries or captures.
 - `mini.surround` mappings use the `gs` prefix instead of the default `s` prefix
   to avoid conflicts with Flash and Vim's default substitute command. The mappings
   are customized in the `setup()` call in `lua/plugins/mini.lua`.
-- `ai.gen_spec.treesitter(...)` exists in `mini.nvim/lua/mini/ai.lua` and is
-  documented as `MiniAi.gen_spec.treesitter()`.
+- `lua/util/ai_treesitter.lua` provides the `f`/`c`/`o` specs via
+  `require("util.ai_treesitter").spec(...)`, replacing `ai.gen_spec.treesitter`.
+  It reads make-range metadata that gen_spec ignores. Do not revert to
+  `ai.gen_spec.treesitter` — inner objects would break in most languages.
 - The custom argument object returns a `mini.ai` region with 1-based line and
   column positions. Keep that convention if editing `util.ai_argument`.
 
@@ -158,12 +168,13 @@ rg -n 'parameter.inner|parameter.outer|make-range' lua/util/ai_argument.lua
 Run from `~/.config/nvim`:
 
 ```bash
-luac -p lua/plugins/mini.lua lua/util/ai_argument.lua
+luac -p lua/plugins/mini.lua lua/util/ai_argument.lua lua/util/ai_treesitter.lua
 nvim --headless -u init.lua -c 'lua
   local ai = require("mini.ai")
   assert(ai.config.n_lines == 500)
   assert(type(ai.config.custom_textobjects.a) == "function")
   assert(type(ai.config.custom_textobjects.f) == "function")
+  assert(type(ai.config.custom_textobjects.o) == "function")
   assert(type(require("mini.surround").config) == "table")
   assert(type(require("mini.icons")) == "table")
   -- Verify gs prefix surround mappings

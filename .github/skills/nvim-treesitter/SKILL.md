@@ -1,88 +1,141 @@
 ---
 name: nvim-treesitter
 description: >-
-  How Treesitter is configured in this config (nvim-treesitter pinned to the
-  master branch = classic setup API, stable on Neovim 0.12), plus the
-  treesitter-textobjects integration and the after/queries/*.scm overrides. Use
-  to add a parser/language, change highlight/indent, edit textobject queries, or
-  understand why the master branch (not main) is used.
+  How Treesitter works in this config AFTER nvim-treesitter was removed: parsers
+  and highlight come from tree-sitter-manager, textobject queries come from
+  nvim-treesitter-textobjects (query files only, never loaded), a make-range!
+  directive handler + util.ai_treesitter resolver make mini.ai work, and
+  after/queries/*.scm add only what upstream omits. Use to add a parser, edit
+  textobject queries/captures, or understand the make-range gotcha.
 covers:
-  - lua/plugins/treesitter.lua
+  - lua/plugins/treesitter-textobjects.lua
+  - lua/util/ai_treesitter.lua
   - after/queries/**/*.scm
 ---
 
 # Treesitter
 
-Configured in `lua/plugins/treesitter.lua`. This config pins
-**nvim-treesitter to the `master` branch** (in `vim.pack.add`, `version =
-"master"`), which uses the **classic `require("nvim-treesitter.configs").setup`
-API**. The newer `main` branch has a different, incompatible API. On Neovim
-0.12 the master/classic API is the stable choice here — do not "upgrade" the
-config to the `main`-branch API.
+**`nvim-treesitter` was removed** (its sole maintainer archived it). This config
+now uses Neovim's **native `vim.treesitter`** plus two narrowly-scoped helpers.
+Do NOT re-add `nvim-treesitter` or its classic
+`require("nvim-treesitter.configs").setup` API.
 
-## What's configured
+## Architecture (who provides what)
+
+| Concern | Source | Skill |
+| --- | --- | --- |
+| Parsers + highlight + folds/indents/injections/locals queries | `tree-sitter-manager.nvim` | `nvim-tree-sitter-manager` |
+| `textobjects.scm` query files | `nvim-treesitter-textobjects` (query data only) | this skill |
+| make-range! handler + textobjects rtp wiring | `lua/plugins/treesitter-textobjects.lua` | this skill |
+| mini.ai resolver (reads plain + make-range captures) | `lua/util/ai_treesitter.lua` | this skill |
+| per-language capture overrides | `after/queries/<lang>/textobjects.scm` | this skill |
+| consuming the textobjects in mini.ai | `lua/plugins/mini.lua`, `lua/util/ai_argument.lua` | `nvim-mini` |
+
+tree-sitter-manager bundles `highlights/folds/indents/injections/locals` but
+**NO `textobjects.scm`** for any language — that is why the textobjects plugin is
+still needed as a query-only data source. Removing nvim-treesitter also dropped
+its `indentexpr=nvim_treesitter#indent()`; treesitter-based indentation is
+intentionally gone (built-in `:filetype indent` only).
+
+## nvim-treesitter-textobjects as a query-only data source
+
+It is installed and pinned by `vim.pack.add` but its Lua runtime is **never
+loaded** — its `plugin/*.vim` hard-requires the removed `nvim-treesitter` and
+would error on startup. See `lua/config/pack.lua`:
+
 ```lua
-require("nvim-treesitter.configs").setup({
-  ensure_installed = { "bash", "c", "cpp", "lua", "java", "typescript", ... },
-  auto_install = true,           -- install missing parsers on the fly
-  highlight = { enable = true },
-  indent = { enable = true },
-})
-vim.filetype.add({ extension = { conf = "hocon" } })  -- .conf -> hocon
+vim.pack.add({
+  { src = ".../nvim-treesitter-textobjects", version = "master" },
+}, { load = function() end })   -- install + pin only, never source
 ```
-`ensure_installed` is an explicit parser list (read the file for the full set).
-`auto_install = true` means opening a new filetype pulls its parser
-automatically (requires a network + a C compiler).
+
+`lua/plugins/treesitter-textobjects.lua` then does the two things needed to use
+its query files natively:
+
+1. **Registers a `make-range!` directive handler.** The textobjects queries
+   define many objects (e.g. `function.inner`, `loop.inner`, `parameter.outer`)
+   via `#make-range!`. `nvim-treesitter` used to register this directive; without
+   a handler, `vim.treesitter` throws `No handler for make-range!` while
+   iterating the query, breaking ALL textobjects. The handler stores the
+   directive's range in `metadata[name].range`.
+2. **Prepends the repo to `runtimepath` on `VimEnter`** (deferred past startup's
+   plugin-sourcing pass, so the broken `plugin/*.vim` is never sourced).
+   Prepended so the upstream base queries come before the `after/queries`
+   overrides (which use `; extends`).
+
+## The make-range invisibility gotcha (READ THIS before editing queries)
+
+mini.ai's *builtin* treesitter resolver only inspects captures listed in
+`query.captures` (the static capture list). `#make-range!` range NAMES are not in
+that list, so directive-produced ranges are invisible to it. This is why this
+config does NOT use `ai.gen_spec.treesitter`; it uses
+`lua/util/ai_treesitter.lua`, a resolver that reads **both** plain `@capture`
+nodes **and** `make-range!` metadata ranges. Result: `function.inner`,
+`class.inner`, `loop.inner`, `conditional.inner` resolve in **every language**
+straight from the upstream queries — **no per-language override needed** for them.
+
+## Query overrides: after/queries/<lang>/textobjects.scm
+
+`after/` files augment (not replace) the upstream query for a language. With the
+make-range-aware resolver, the ONLY overrides still needed are objects upstream
+never defines at all:
+
+- `after/queries/c/textobjects.scm` and `cpp` — add `@block.inner` for
+  `compound_statement` (upstream gives `@block.outer` but no inner), so mini.ai's
+  `io` works.
+- `after/queries/java/textobjects.scm` — add `@block.inner` for `(block)`, and
+  capture `record`/`interface`/`enum` declarations as `@class` (upstream only
+  captures plain `class_declaration`).
+
+Do not re-add `function.inner`/`class.inner` overrides — they are redundant now
+(upstream make-range + the resolver handle them). Keep the user-approved
+`"{" (_)+ @block.inner "}"` form for block captures; do not rewrite it using
+`#make-range!`.
 
 ## Add a language/parser
-Append the parser name to `ensure_installed` in `treesitter.lua`. Parser names
-are the treesitter language ids (e.g. `python`, `rust`, `go`), not filetypes.
-Confirm the exact id against the installed parser list:
-```bash
-ls ~/.local/share/nvim/site/pack/core/opt/nvim-treesitter/parser/   # installed
-# or inside nvim:
-nvim --headless -u init.lua -c 'TSInstallInfo' -c 'qa!'
-```
 
-## Textobjects (nvim-treesitter-textobjects)
-The textobjects plugin (also pinned `master`) provides the queries consumed by
-**mini.ai** for `af/if` (function), `ac/ic` (class), `ao/io`
-(block/conditional/loop) and the custom `aa/ia` argument object. The wiring is
-in `lua/plugins/mini.lua` + `lua/util/ai_argument.lua` — see `nvim-mini`. This
-config does NOT use the textobjects plugin's own keymap module; mini.ai is the
-front-end.
-
-## Query overrides: after/queries/<lang>/*.scm
-`after/queries/{c,cpp,java}/textobjects.scm` override/extend the textobject
-captures for those languages. Files in `after/` are loaded after the plugin's
-own queries, so they augment them. Edit these to change what `@function.inner`,
-`@parameter.inner`, etc. capture for a language.
-
-Important gotcha (documented in `util/ai_argument.lua`): `@parameter.outer` in
-these grammars uses the `#make-range!` directive, which nvim-treesitter on
-master on 0.12 fails to resolve via native `vim.treesitter` — that's why the
-argument textobject is built on the plain `@parameter.inner` capture instead.
-Keep this in mind when editing argument queries.
+Parsers are managed by tree-sitter-manager, not here. Add the language id to
+`ensure_installed` in `lua/plugins/tree-sitter-manager.lua` (see
+`nvim-tree-sitter-manager`). Textobjects for a new language work automatically if
+`nvim-treesitter-textobjects` ships a `queries/<lang>/textobjects.scm`; only add
+an `after/queries` override if a specific object is missing upstream.
 
 ## Docs / ground truth
-- `:help nvim-treesitter` and the plugin's `doc/`:
-  `~/.local/share/nvim/site/pack/core/opt/nvim-treesitter/doc/`.
-- Textobjects:
-  `~/.local/share/nvim/site/pack/core/opt/nvim-treesitter-textobjects/`.
-- Inspect live captures with `:Inspect` (highlight) and `:InspectTree`
-  (syntax tree) on a buffer.
+
+- Textobjects query files (the data source):
+  `~/.local/share/nvim/site/pack/core/opt/nvim-treesitter-textobjects/queries/<lang>/textobjects.scm`
+- make-range handler contract: `$VIMRUNTIME/lua/vim/treesitter/query.lua`
+  (`add_directive`, `_apply_directives`).
+- mini.ai builtin resolver (why make-range is invisible):
+  `~/.local/share/nvim/site/pack/core/opt/mini.nvim/lua/mini/ai.lua`
+  (`H.append_ranges`, `H.get_matched_ranges_builtin`).
+- Inspect live captures with `:Inspect` and `:InspectTree` on a buffer.
 
 ## Verify your change
+
 ```bash
 cd ~/.config/nvim
-luac -p lua/plugins/treesitter.lua
-nvim --headless -u init.lua -c 'qa!'
-# Parser present for a language:
+luac -p lua/plugins/treesitter-textobjects.lua lua/util/ai_treesitter.lua
+nvim --headless -u init.lua -c 'qa!'   # loads clean, no "No handler for make-range!"
+
+# make-range! handler registered:
 nvim --headless -u init.lua \
-  -c 'lua print(pcall(vim.treesitter.language.inspect, "lua"))' -c 'qa!'
-# A textobjects query parses for a language (after/ overrides applied):
-nvim --headless -u init.lua some.java \
-  -c 'lua print(vim.treesitter.query.get("java","textobjects") ~= nil)' -c 'qa!'
+  -c 'lua print(vim.tbl_contains(vim.treesitter.query.list_directives(), "make-range!"))' \
+  -c 'qa!' 2>&1 | grep -v 'tbl_flatten\|js-i18n\|npm install'
+
+# textobjects resolve (VimEnter fires the rtp prepend, then mini.ai sees them):
+printf 'int add(int a,int b){\n int s=a+b;\n return s;\n}\n' > /tmp/v.cpp
+nvim --headless -u init.lua -c 'lua
+  vim.cmd("doautocmd VimEnter")
+  vim.cmd("edit! /tmp/v.cpp"); local b=vim.api.nvim_get_current_buf()
+  vim.bo[b].filetype="cpp"; vim.treesitter.start(b,"cpp")
+  vim.treesitter.get_parser(b,"cpp"):parse()
+  vim.api.nvim_win_set_cursor(0,{2,4})
+  local ai=require("mini.ai")
+  print("io=", ai.find_textobject("i","o")~=nil, "if=", ai.find_textobject("i","f")~=nil)
+' -c 'qa!' 2>&1 | grep -E 'io=|No textobject'
+rm -f /tmp/v.cpp
 ```
-Editing a `.scm` query? A malformed query throws when
-`vim.treesitter.query.get` is called — the second check above surfaces it.
+
+A malformed `.scm` query throws when `vim.treesitter.query.get` is first called
+for that language; the cpp check above surfaces it.

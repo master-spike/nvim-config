@@ -17,9 +17,11 @@
 -- argument always leaves a well-formed list.
 --
 -- NOTE: `@parameter.outer` is intentionally not used. In these grammars it is
--- defined via the `#make-range!` directive, which nvim-treesitter (master) on
--- Neovim 0.12 fails to resolve; `@parameter.inner` is a plain capture and works
--- with the native `vim.treesitter` API.
+-- defined via the `#make-range!` directive, whose range name never appears in
+-- the query's static capture list, so the native `vim.treesitter` query API
+-- (and mini.ai's builtin resolver) cannot see it. `@parameter.inner` is a plain
+-- capture and works. This is also why after/queries/{c,cpp,java} re-declare
+-- function.inner/block.inner as real captures.
 
 local M = {}
 

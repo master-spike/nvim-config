@@ -26,17 +26,26 @@ packer. Everything lives in `lua/config/pack.lua`. Plugins are cloned to
    vim.pack.add({
      { src = "https://github.com/nvim-telescope/telescope.nvim" },
      { src = "https://github.com/saghen/blink.cmp", version = "v1.6.0" },
-     { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "master" },
+     { src = "https://github.com/romus204/tree-sitter-manager.nvim" },
      {
        src = "https://github.com/nvim-neo-tree/neo-tree.nvim",
        version = vim.version.range("3"),
      },
    })
    ```
+
+   A second `vim.pack.add` call installs `nvim-treesitter-textobjects` with a
+   no-op `load` so it is **installed and pinned but never sourced** (used only as
+   a query data source — see `nvim-treesitter`):
+   ```lua
+   vim.pack.add({
+     { src = ".../nvim-treesitter-textobjects", version = "master" },
+   }, { load = function() end })
+   ```
 2. **Configure** via the module loader loop — a `modules` table of plugin module
    names, each `require`d under `pcall`:
    ```lua
-   local modules = { "colorscheme", "treesitter", "telescope", ... }
+   local modules = { "colorscheme", "tree-sitter-manager", "treesitter-textobjects", "telescope", ... }
    for _, m in ipairs(modules) do
      local ok, err = pcall(require, "plugins." .. m)
      if not ok then
@@ -55,8 +64,12 @@ packer. Everything lives in `lua/config/pack.lua`. Plugins are cloned to
   resolves to `3.0.0 - 4.0.0`).
 - omitted → tracks the default branch.
 
-Pin a plugin that needs a specific branch/API. Treesitter is pinned to `master`
-on purpose (classic setup API, stable on 0.12 — see `nvim-treesitter`).
+Pin a plugin that needs a specific branch/API. `nvim-treesitter-textobjects` is
+pinned to `master` and loaded via a no-op `load` callback so vim.pack installs +
+pins it without sourcing its (broken) runtime — see `nvim-treesitter`. To remove
+a plugin's dir AND lockfile entry, use `vim.pack.del({ "<name>" })`; deleting the
+dir or editing the lockfile by hand is not enough (vim.pack re-clones from the
+lockfile on the next start).
 
 ## The lockfile: nvim-pack-lock.json
 `~/.config/nvim/nvim-pack-lock.json` records the exact `rev` (commit) + `src`
@@ -68,6 +81,17 @@ Note: the lockfile may contain plugins **not** in the current `vim.pack.add`
 list (e.g. extra colorschemes `catppuccin`, `gruvbox`, `kanagawa`, `nightfox`).
 Those are previously-installed leftovers, not active — only entries in
 `vim.pack.add` are loaded.
+
+## Self-heal guard: stray non-git dirs crash startup
+The top of `lua/config/pack.lua` (before `vim.pack.add`) prunes any directory in
+`site/pack/core/opt/` that lacks a `.git`. This is mandatory, not cosmetic:
+`vim.pack`'s `lock_sync()` traverses **every** entry in `opt/` on each startup and,
+for a directory with no git metadata, calls `lock_repair()` which runs `git`
+inside it and **aborts init** with a fatal `E5113 ... not a git repository`.
+Every real plugin is a git clone (has `.git`); tree-sitter-manager parsers live
+under `site/parser`, never `opt/`. So a non-git dir in `opt/` is always stray
+junk (historically a leftover `nvim-treesitter/parser` recreated after the plugin
+was removed) and is safe to delete. Do not remove this guard.
 
 ## Build steps (compiled plugins)
 Some plugins need a build. `pack.lua` handles telescope-fzf-native inline after

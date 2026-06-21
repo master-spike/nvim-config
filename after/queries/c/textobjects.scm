@@ -1,9 +1,9 @@
 ; extends
-; Add function.inner for function_definition (C doesn't define it by default)
-; Captures the function body statements, allowing dif/yif/etc to work
-
-(function_definition
-  body: (compound_statement
-    "{"
-    (_)+ @function.inner
-    "}"))
+; Upstream provides @block.outer for compound_statement but no block.inner, so
+; mini.ai's `io` (inside block) has nothing to select. Add a real capture.
+; (function.inner/class.inner/etc. come from upstream via #make-range!, which
+; util.ai_treesitter resolves, so they need no override here.)
+(compound_statement
+  "{"
+  (_)+ @block.inner
+  "}")

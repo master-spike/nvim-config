@@ -1,5 +1,24 @@
 -- Plugin management via Neovim 0.12 builtin vim.pack.
 -- Plugins are cloned into stdpath('data')/site/pack/core/opt and added to rtp.
+
+-- Self-heal stray non-git directories under the pack opt dir.
+-- vim.pack's lock_sync() traverses EVERY entry in opt/ on startup and, for any
+-- directory missing git metadata, calls lock_repair() which runs `git` inside
+-- it and aborts init with a fatal "not a git repository" error. Every real
+-- vim.pack plugin is a git clone (has .git); parsers from tree-sitter-manager
+-- live under site/parser, never here. So any non-git directory in opt/ is stray
+-- junk (e.g. a leftover `nvim-treesitter/parser` from the removed plugin) and is
+-- safe to delete. Removing it here keeps startup resilient to recurrence.
+local opt_dir = vim.fs.joinpath(vim.fn.stdpath("data"), "site/pack/core/opt")
+for name, fs_type in vim.fs.dir(opt_dir) do
+  if fs_type == "directory" then
+    local path = vim.fs.joinpath(opt_dir, name)
+    if vim.uv.fs_stat(vim.fs.joinpath(path, ".git")) == nil then
+      vim.fs.rm(path, { recursive = true, force = true })
+    end
+  end
+end
+
 vim.pack.add({
   -- Library / icons
   { src = "https://github.com/nvim-lua/plenary.nvim" },
@@ -9,9 +28,9 @@ vim.pack.add({
   -- Colorschemes
   { src = "https://github.com/marko-cerovac/material.nvim" },
 
-  -- Treesitter (master branch = classic setup API, stable on 0.12)
-  { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "master" },
-  { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "master" },
+  -- Treesitter parser management (native vim.treesitter; no nvim-treesitter).
+  -- tree-sitter-manager installs parsers + bundles highlight queries.
+  { src = "https://github.com/romus204/tree-sitter-manager.nvim" },
 
   -- Fuzzy finder
   { src = "https://github.com/nvim-telescope/telescope.nvim" },
@@ -60,6 +79,19 @@ vim.pack.add({
   { src = "https://github.com/master-spike/99", version = "dev" },
 })
 
+-- nvim-treesitter-textobjects is installed and pinned only as a source of its
+-- queries/<lang>/textobjects.scm files (mini.ai consumes them via native
+-- vim.treesitter). Its Lua runtime is NEVER loaded: its plugin/*.vim
+-- hard-requires the removed nvim-treesitter and would error on startup. The
+-- callable `load` makes vim.pack install + pin it without sourcing it; the
+-- lua/plugins/treesitter-textobjects.lua module registers the make-range!
+-- directive and adds the repo to 'runtimepath' after startup.
+vim.pack.add({
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "master" },
+}, {
+  load = function() end,
+})
+
 -- Load the local development copy of 99 from pack/mine/opt/99.
 -- vim.cmd.packadd("99")
 
@@ -75,7 +107,8 @@ end
 local modules = {
   "99",
   "colorscheme",
-  "treesitter",
+  "tree-sitter-manager",
+  "treesitter-textobjects",
   "telescope",
   "completion",
   "mason",
