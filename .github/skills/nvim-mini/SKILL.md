@@ -45,6 +45,8 @@ ai.setup({
     a = argument,
     f = treesitter({ a = "@function.outer", i = "@function.inner" }),
     c = treesitter({ a = "@class.outer", i = "@class.inner" }),
+    d = treesitter({ a = "@statement.outer", i = "@statement.outer" }),
+    m = treesitter({ a = "@call.outer", i = "@call.inner" }),
     o = treesitter({
       a = { "@block.outer", "@conditional.outer", "@loop.outer" },
       i = { "@block.inner", "@conditional.inner", "@loop.inner" },
@@ -71,6 +73,8 @@ require("mini.icons").setup()
 aa / ia  argument or parameter, from util.ai_argument.spec
 af / if  function, from @function.outer and @function.inner
 ac / ic  class, from @class.outer and @class.inner
+ad / id  statements or declarations, from @statement.outer
+am / im  method/function calls, from @call.outer and @call.inner
 ao / io  block, conditional, or loop captures
 ```
 
@@ -97,6 +101,8 @@ yif  yank inside function
 vac  visually select around class
 daa  delete around argument
 cia  change inside argument
+dad  delete around statement/declaration
+mam  delete around method/function call
 ```
 
 Use `mini.surround` with the `gs` prefix (to avoid conflicts with Flash and other plugins):
@@ -174,6 +180,8 @@ nvim --headless -u init.lua -c 'lua
   assert(ai.config.n_lines == 500)
   assert(type(ai.config.custom_textobjects.a) == "function")
   assert(type(ai.config.custom_textobjects.f) == "function")
+  assert(type(ai.config.custom_textobjects.d) == "function")
+  assert(type(ai.config.custom_textobjects.m) == "function")
   assert(type(ai.config.custom_textobjects.o) == "function")
   assert(type(require("mini.surround").config) == "table")
   assert(type(require("mini.icons")) == "table")

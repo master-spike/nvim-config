@@ -39,6 +39,16 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("cpp_indent"),
+  pattern = { "c", "cpp", "objc", "objcpp" },
+  callback = function()
+    vim.bo.cindent = false
+    vim.bo.smartindent = false
+    vim.bo.indentexpr = "v:lua.require('util.treesitter_indent').indentexpr()"
+  end,
+})
+
 -- Auto-create missing parent dirs on save
 vim.api.nvim_create_autocmd("BufWritePre", {
   group = augroup("auto_create_dir"),

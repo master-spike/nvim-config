@@ -72,6 +72,9 @@ wk.add({
 ## Practical guidance
 
 - Prefer `wk.add()` when you want labels for prefixes or virtual mappings.
+- `lua/plugins/whichkey.lua` also adds virtual labels for mini.ai's custom
+  `d` (statement/declaration) and `m` (method/function call) object ids so
+  the around/inside prefixes can surface them in the popup.
 - Use real mappings and descriptions when possible; which-key can display those
   automatically.
 - If you need discoverability for a custom workflow, consider a dedicated keymap

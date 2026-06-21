@@ -10,6 +10,7 @@ description: >-
 covers:
   - lua/plugins/treesitter-textobjects.lua
   - lua/util/ai_treesitter.lua
+  - lua/util/treesitter_indent.lua
   - after/queries/**/*.scm
 ---
 
@@ -33,9 +34,9 @@ Do NOT re-add `nvim-treesitter` or its classic
 
 tree-sitter-manager bundles `highlights/folds/indents/injections/locals` but
 **NO `textobjects.scm`** for any language — that is why the textobjects plugin is
-still needed as a query-only data source. Removing nvim-treesitter also dropped
-its `indentexpr=nvim_treesitter#indent()`; treesitter-based indentation is
-intentionally gone (built-in `:filetype indent` only).
+still needed as a query-only data source. This repo now uses a small local
+adapter, `lua/util/treesitter_indent.lua`, that reads the installed `indents.scm`
+queries from tree-sitter-manager and exposes an `indentexpr` for C/C++ buffers.
 
 ## nvim-treesitter-textobjects as a query-only data source
 
@@ -115,7 +116,7 @@ an `after/queries` override if a specific object is missing upstream.
 
 ```bash
 cd ~/.config/nvim
-luac -p lua/plugins/treesitter-textobjects.lua lua/util/ai_treesitter.lua
+luac -p lua/plugins/treesitter-textobjects.lua lua/util/ai_treesitter.lua lua/util/treesitter_indent.lua
 nvim --headless -u init.lua -c 'qa!'   # loads clean, no "No handler for make-range!"
 
 # make-range! handler registered:
@@ -123,17 +124,17 @@ nvim --headless -u init.lua \
   -c 'lua print(vim.tbl_contains(vim.treesitter.query.list_directives(), "make-range!"))' \
   -c 'qa!' 2>&1 | grep -v 'tbl_flatten\|js-i18n\|npm install'
 
-# textobjects resolve (VimEnter fires the rtp prepend, then mini.ai sees them):
-printf 'int add(int a,int b){\n int s=a+b;\n return s;\n}\n' > /tmp/v.cpp
+# treesitter-based indentation for C/C++:
+printf 'namespace foo {\nint x = 1;\n}\n' > /tmp/v.cpp
 nvim --headless -u init.lua -c 'lua
   vim.cmd("doautocmd VimEnter")
-  vim.cmd("edit! /tmp/v.cpp"); local b=vim.api.nvim_get_current_buf()
-  vim.bo[b].filetype="cpp"; vim.treesitter.start(b,"cpp")
-  vim.treesitter.get_parser(b,"cpp"):parse()
-  vim.api.nvim_win_set_cursor(0,{2,4})
-  local ai=require("mini.ai")
-  print("io=", ai.find_textobject("i","o")~=nil, "if=", ai.find_textobject("i","f")~=nil)
-' -c 'qa!' 2>&1 | grep -E 'io=|No textobject'
+  vim.cmd("edit! /tmp/v.cpp")
+  local b = vim.api.nvim_get_current_buf()
+  vim.bo[b].filetype = "cpp"
+  vim.cmd("doautocmd FileType")
+  local indent = vim.fn.eval("indent(2)")
+  print("indent_line2=" .. indent)
+' -c 'qa!' 2>&1 | grep -E 'indent_line2'
 rm -f /tmp/v.cpp
 ```
 

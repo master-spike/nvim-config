@@ -67,7 +67,8 @@ end
 ```
 Always pass `group = augroup("something")` when adding an autocmd here, matching
 the existing entries (highlight-on-yank, restore last cursor location, close
-certain filetypes with `q`, auto-create missing parent dirs on save).
+certain filetypes with `q`, enable Treesitter-based C/C++ indentation,
+auto-create missing parent dirs on save).
 
 Pattern to add a new autocmd:
 ```lua

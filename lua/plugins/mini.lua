@@ -16,6 +16,8 @@ local treesitter = require("util.ai_treesitter").spec
 -- Treesitter-backed text objects (queries from nvim-treesitter-textobjects):
 --   af/if  function (outer/inner)  -> daf, dif, yaf, cif, vaf, ...
 --   ac/ic  class
+--   ad/id  statements / declarations (e.g. semicolon-terminated statements)
+--   am/im  method/function calls
 --   ao/io  block / conditional / loop
 --   aa/ia  argument / parameter (treesitter, nesting- & multiline-aware)
 ai.setup({
@@ -24,6 +26,8 @@ ai.setup({
     a = argument,
     f = treesitter({ a = "@function.outer", i = "@function.inner" }),
     c = treesitter({ a = "@class.outer", i = "@class.inner" }),
+    d = treesitter({ a = "@statement.outer", i = "@statement.outer" }),
+    m = treesitter({ a = "@call.outer", i = "@call.inner" }),
     o = treesitter({
       a = { "@block.outer", "@conditional.outer", "@loop.outer" },
       i = { "@block.inner", "@conditional.inner", "@loop.inner" },
