@@ -37,12 +37,12 @@ ai.setup({
 
 require("mini.surround").setup({
   mappings = {
-    add = "gsa",      -- Add surrounding
-    delete = "gsd",   -- Delete surrounding
-    find = "gsf",     -- Find surrounding
+    add = "gsa", -- Add surrounding
+    delete = "gsd", -- Delete surrounding
+    find = "gsf", -- Find surrounding
     find_left = "gsF", -- Find left surrounding
     highlight = "gsh", -- Highlight surrounding
-    replace = "gsr",  -- Replace surrounding
+    replace = "gsr", -- Replace surrounding
   },
 })
 require("mini.icons").setup()
