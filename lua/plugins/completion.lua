@@ -17,7 +17,11 @@ require("blink.cmp").setup({
     documentation = { auto_show = true, auto_show_delay_ms = 200 },
   },
   sources = {
-    default = { "lsp", "path", "snippets", "buffer" },
+    default = { "lsp", "path", "snippets", "akka", "buffer" },
+    providers = {
+      -- Akka Java SDK snippets that deduce the package from the file path.
+      akka = { name = "Akka", module = "util.akka_snippets" },
+    },
   },
   signature = { enabled = true },
 })
