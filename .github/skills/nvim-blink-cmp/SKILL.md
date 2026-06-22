@@ -106,9 +106,10 @@ substitution — neither applies VSCode variable *transforms*. Deducing the Java
   function `(ctx) -> string` (ctx = `{ package, class_file }`) that allocates
   tabstops lazily via `new_builder(ctx)`. `consumer_body(annotation, handler)`
   factors the shared Consumer skeleton.
-- Current triggers: `akka-endpoint`, `akka-consumer-event-sourced-entity`,
-  `akka-consumer-key-value-entity`, `akka-consumer-workflow`,
-  `akka-consumer-service-stream`, `akka-consumer-topic`.
+- Current triggers: `akka-endpoint`, `akka-key-value-entity`,
+  `akka-consumer-event-sourced-entity`, `akka-consumer-key-value-entity`,
+  `akka-consumer-workflow`, `akka-consumer-service-stream`,
+  `akka-consumer-topic`.
 
 ## Docs / ground truth
 

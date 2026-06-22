@@ -160,6 +160,43 @@ local function consumer_body(annotation, handler)
   end
 end
 
+-- Builds a simple Key Value Entity body with a nested `State` record, an update
+-- method and a read method. The component id is the class name in kebab case.
+local function kve_body(ctx)
+  local b = new_builder(ctx)
+  local package = b.package()
+  local component_id = b.component_id()
+  local field = b.ts("String value")
+  local update = b.ts("update")
+  local read = b.ts("getState")
+
+  return table.concat({
+    "package " .. package .. ";",
+    "",
+    "import akka.Done;",
+    "import akka.javasdk.annotations.Component;",
+    "import akka.javasdk.keyvalueentity.KeyValueEntity;",
+    "import org.slf4j.Logger;",
+    "import org.slf4j.LoggerFactory;",
+    "",
+    '@Component(id = "' .. component_id .. '")',
+    "public class $TM_FILENAME_BASE extends KeyValueEntity<$TM_FILENAME_BASE.State> {",
+    "",
+    "  private final Logger logger = LoggerFactory.getLogger(getClass());",
+    "",
+    "  public record State(" .. field .. ") {}",
+    "",
+    "  public Effect<Done> " .. update .. "(State state) {",
+    "    return effects().updateState(state).thenReply(Done.getInstance());",
+    "  }",
+    "",
+    "  public ReadOnlyEffect<State> " .. read .. "() {",
+    "    ${0:return effects().reply(currentState());}",
+    "  }",
+    "}",
+  }, "\n")
+end
+
 -- Each spec builds its body from the buffer context. New component snippets are
 -- added here.
 local specs = {
@@ -167,6 +204,11 @@ local specs = {
     trigger = "akka-endpoint",
     description = "Akka HTTP endpoint with ComponentClient and an SLF4J logger",
     body = endpoint_body,
+  },
+  {
+    trigger = "akka-key-value-entity",
+    description = "Akka Key Value Entity with a State record and an SLF4J logger",
+    body = kve_body,
   },
   {
     trigger = "akka-consumer-event-sourced-entity",
