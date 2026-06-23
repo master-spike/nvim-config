@@ -10,6 +10,7 @@ covers:
   - lua/config/options.lua
   - lua/config/keymaps.lua
   - lua/config/autocmds.lua
+  - lua/util/fold.lua
 ---
 
 # Core: options, keymaps, autocmds
@@ -31,6 +32,72 @@ keymap; indentation/search/UI/file behaviour are set via `vim.opt`; the system
 clipboard is used; and `grepprg` switches to `rg` when `rg` is on `PATH`.
 
 To change an option: edit this file, keep the `opt.<name> = <value>` style.
+
+### Folding
+Treesitter-based folds are enabled here and start fully open:
+```lua
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldtext = ""        -- keep syntax-highlighted fold lines
+opt.foldlevel = 99       -- open all folds on buffer open
+opt.foldlevelstart = 99
+opt.foldnestmax = 4
+```
+Parsers/highlight come from tree-sitter-manager (`nvim-tree-sitter-manager`);
+`vim.treesitter.foldexpr()` returns `0` (no folds) for buffers without a parser,
+so this is safe globally. Folds are driven by the built-in `z*` mappings
+(`za`, `zR`, `zM`, …) — no custom fold keymaps are defined.
+
+The fold gutter is NOT the native `foldcolumn` (which collapses nested depth into
+digits). It is `opt.foldcolumn = "0"` plus a custom `opt.statuscolumn` built in
+`lua/util/fold.lua`:
+- `M.marker()` shows a single chevron only on a fold-start line, detected from
+  the raw `vim.treesitter.foldexpr(l)` value beginning with `>` (NOT a
+  `foldlevel(l) > foldlevel(l-1)` increase — that misses sibling folds at the
+  same level, e.g. two `if` blocks in one function body): `0xf0140`
+  (chevron-down) when open, `0xf0142` (chevron-right, reads like `>`) when
+  closed; a blank cell otherwise. So no depth numbers ever appear. It is placed
+  first in `statuscolumn` so it sits in the leftmost gutter column (where the
+  native foldcolumn used to be), before signs and numbers.
+- `M.number()` reproduces `number` / `relativenumber` (blank on wrapped/virtual
+  lines) since a `statuscolumn` replaces the whole gutter.
+- The glyphs use `vim.fn.nr2char(...)`; do NOT paste nerd-font glyphs literally
+  (that previously tripped `E1511: Wrong number of characters` in `fillchars`).
+- `fillchars.fold = "╌"` fills the fold line past the `M.foldtext()` label with the
+  same double-dash (rendered in the `Folded` highlight) so the dashed texture
+  runs to the window edge.
+- Active-fold illumination: the chevron of the innermost fold *containing the
+  cursor* is highlighted with the `FoldActive` group (see `nvim-colorscheme`).
+  `active_fold_start()` finds it by walking UP from the cursor and returning the
+  nearest fold-start line whose `foldlevel` equals the cursor's depth — the
+  `foldlevel(s) == level` guard is essential, otherwise deeper sibling folds
+  sitting above the cursor (but not containing it) get wrongly picked. The walk
+  is bounded by the parent fold (`foldlevel(s-1) < level`).
+- `M.update_active()` caches the result in `M._active = { buf, line }`. A
+  `config_fold` autocmd (`CursorMoved` / `CursorMovedI` / `BufEnter` /
+  `WinEnter`) refreshes the cache; `relativenumber` forces a statuscolumn redraw
+  on every cursor move so the highlighted chevron tracks the cursor.
+- `M.marker()` wraps the active chevron in `%#FoldActive#…%*`. Because of that,
+  the marker segment in `statuscolumn` uses the `%{%…%}` form (which interprets
+  embedded highlight items), while `M.number()` stays in the plain `%{…}` form.
+
+Closed folds show a `'foldtext'` rendered by `M.foldtext()` (wired via
+`opt.foldtext = "v:lua.require'util.fold'.foldtext()"`):
+- The fold's first line is split into chunks: each whitespace character that is
+  NOT directly adjacent to a code character becomes a double-dash `╌` in the
+  muted `Folded` highlight, while whitespace touching code stays blank (so single
+  inter-token spaces and the space before the first token are kept). Code runs
+  stay in `FoldLine` (golden yellow, matching `MatchParen`). A ` ╌╌ ` separator
+  (two dashes flanked by spaces) then a `N lines` label in `FoldCount` (blue
+  italic), then a one-space gap before the trailing dash fill, follow.
+  `N = v:foldend - v:foldstart + 1`. All three groups are in `nvim-colorscheme`.
+- This uses `'foldtext'` rather than decoration-provider virtual text on purpose:
+  ephemeral `virt_text` from `nvim_set_decoration_provider`/`on_line` is NOT
+  rendered on a closed fold's first line (it shows fine on a normal line), and a
+  decoration provider may only mutate the buffer via *ephemeral* marks, so that
+  route is a dead end for fold labels. `'foldtext'` is always drawn for folds.
+- Tabs in the line are expanded to spaces via `vim.bo.tabstop` so they become
+  dashes too and the label lines up.
 
 ## keymaps.lua — global `vim.keymap.set`
 `lua/config/keymaps.lua`. The durable conventions (not the specific keys — read

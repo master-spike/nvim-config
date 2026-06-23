@@ -103,6 +103,18 @@ material.setup({
 
     -- Telescope filename component (set by telescope path_display style)
     TelescopeResultsFileName = { fg = material_colors.main.orange },
+
+    -- Folded lines: a lighter gray block instead of the default darker bg_alt
+    Folded = { bg = material_colors.editor.active, fg = material_colors.editor.fg_dark },
+
+    -- Chevron of the innermost fold under the cursor (statuscolumn, see util/fold.lua)
+    FoldActive = { fg = material_colors.main.blue, bold = true },
+
+    -- Virtual "N lines" label on a closed fold (see util/fold.lua)
+    FoldCount = { fg = material_colors.main.blue, italic = true },
+
+    -- Closed-fold code line: golden yellow, matching MatchParen (see util/fold.lua)
+    FoldLine = { fg = material_colors.main.yellow },
   },
 })
 

@@ -43,7 +43,19 @@ opt.pumheight = 10
 opt.winminwidth = 5
 
 opt.list = true
-opt.fillchars = { eob = " ", diff = "╱" }
+opt.fillchars = { eob = " ", diff = "╱", fold = "╌" }
+
+-- Treesitter-based folding, with everything unfolded on open. The fold gutter is
+-- drawn by a custom 'statuscolumn' (see lua/util/fold.lua) so it shows a single
+-- chevron at fold starts instead of the native depth digits.
+opt.foldcolumn = "0"
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldtext = "v:lua.require'util.fold'.foldtext()"
+opt.foldlevel = 99
+opt.foldlevelstart = 99
+opt.foldnestmax = 4
+opt.statuscolumn = require("util.fold").statuscolumn
 
 -- Ported from previous config
 vim.g.snacks_animate = false

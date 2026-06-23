@@ -51,7 +51,15 @@ What each part is for:
   integrations, `styles`/`contrast`/`disable` toggles, and `custom_highlights`
   for any highlight group the theme should own (Treesitter/LSP/cmp/which-key
   groups, plus the `TelescopeResultsFileName` group that `nvim-telescope`'s
-  `path_display` colours). Verify any option/plugin name against
+  `path_display` colours, and `Folded` which is overridden to a lighter gray —
+  `editor.active` bg / `editor.fg_dark` fg — instead of Material's default
+  darker `bg_alt`, plus `FoldActive` — `main.blue` fg, `bold` — used by the
+  custom fold gutter in `lua/util/fold.lua` to illuminate the chevron of the
+  innermost fold containing the cursor; and `FoldCount` — `main.blue` fg,
+  `italic` — and `FoldLine` — `main.yellow` fg (golden, matching `MatchParen`) —
+  used by `M.foldtext()` to render a closed fold as its first line plus a
+  `  N lines` label; see `nvim-core-options-keymaps-autocmds`).
+  Verify any option/plugin name against
   `doc/material.nvim.txt` before adding it.
 - **`vim.cmd.colorscheme("material")`** — applies the theme; must come after setup.
 - **trailing `vim.api.nvim_set_hl(...)`** — a few WhichKey float groups are
