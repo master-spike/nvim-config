@@ -74,6 +74,10 @@
       "rev": "a59a9b7fb0a42cbcf022938ee5f0724320b66f63",
       "src": "https://github.com/echasnovski/mini.nvim"
     },
+    "mini.splitjoin": {
+      "rev": "4a0e6f5ea83148f6884eed03f287f94c3f22915d",
+      "src": "https://github.com/nvim-mini/mini.splitjoin"
+    },
     "neo-tree.nvim": {
       "rev": "83e7a2982fd12b9c3d35bc39dd5877cd91a02a61",
       "src": "https://github.com/nvim-neo-tree/neo-tree.nvim",

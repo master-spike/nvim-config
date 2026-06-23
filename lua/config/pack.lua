@@ -55,6 +55,7 @@ vim.pack.add({
 
   -- Editing / UI
   { src = "https://github.com/echasnovski/mini.nvim" },
+  { src = "https://github.com/nvim-mini/mini.splitjoin" },
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
   { src = "https://github.com/nvim-lualine/lualine.nvim" },
   { src = "https://github.com/akinsho/bufferline.nvim" },
