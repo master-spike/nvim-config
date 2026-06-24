@@ -38,7 +38,7 @@ Treesitter-based folds are enabled here and start fully open:
 ```lua
 opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-opt.foldtext = ""        -- keep syntax-highlighted fold lines
+opt.foldtext = "v:lua.require'util.fold'.foldtext()"  -- custom closed-fold line
 opt.foldlevel = 99       -- open all folds on buffer open
 opt.foldlevelstart = 99
 opt.foldnestmax = 4
@@ -50,15 +50,35 @@ so this is safe globally. Folds are driven by the built-in `z*` mappings
 
 The fold gutter is NOT the native `foldcolumn` (which collapses nested depth into
 digits). It is `opt.foldcolumn = "0"` plus a custom `opt.statuscolumn` built in
-`lua/util/fold.lua`:
-- `M.marker()` shows a single chevron only on a fold-start line, detected from
-  the raw `vim.treesitter.foldexpr(l)` value beginning with `>` (NOT a
+`lua/util/fold.lua`.
+
+> **Performance/stability invariant (do not break):** the `statuscolumn`
+> callbacks (`M.marker` / `M.number`) MUST be pure cache lookups and must NEVER
+> call `vim.treesitter.foldexpr()`. An earlier version called `foldexpr` per
+> visible line during redraw; doing that re-entrantly with the fold engine
+> **intermittently hangs the UI on the main thread** (frozen pane, no input,
+> needs `kill -9`, and crucially logs *no* error — it is a hang, not a crash, and
+> is NOT limited to large files). Fold starts and marks are now precomputed
+> **off the redraw path** by `M.refresh()` and cached per buffer.
+
+- Caches: `M._foldstarts[buf] = { tick, set }` (lines where a Treesitter fold
+  starts) and `M._marks[buf] = { [lnum] = letter }`. `M.refresh(buf)` (only ever
+  for the current buffer) rescans fold starts when the buffer `changedtick`
+  changed and always recomputes marks, then issues a targeted
+  `vim.api.nvim__redraw({ buf, statuscolumn = true })`.
+- `M.marker()` is a lookup: a **mark letter takes priority** (`%#FoldMark#…%*`,
+  `main.purple`), else a fold chevron on a cached fold-start line, else a blank.
+  Fold starts are detected (in `compute_foldstarts`, off-redraw) from the raw
+  `vim.treesitter.foldexpr(l)` value beginning with `>` (NOT a
   `foldlevel(l) > foldlevel(l-1)` increase — that misses sibling folds at the
   same level, e.g. two `if` blocks in one function body): `0xf0140`
   (chevron-down) when open, `0xf0142` (chevron-right, reads like `>`) when
-  closed; a blank cell otherwise. So no depth numbers ever appear. It is placed
-  first in `statuscolumn` so it sits in the leftmost gutter column (where the
-  native foldcolumn used to be), before signs and numbers.
+  closed. So no depth numbers ever appear. It is placed first in `statuscolumn`
+  so it sits in the leftmost gutter column, before signs and numbers.
+- Marks shown: buffer-local lowercase `a`–`z` (`getmarklist(buf)`) plus global
+  uppercase `A`–`Z` whose `file` resolves to this buffer (`getmarklist()`).
+  `compute_foldstarts` is skipped above `MAX_SCAN_LINES` (4000) — big files just
+  omit chevrons rather than risk a slow synchronous scan.
 - `M.number()` reproduces `number` / `relativenumber` (blank on wrapped/virtual
   lines) since a `statuscolumn` replaces the whole gutter.
 - The glyphs use `vim.fn.nr2char(...)`; do NOT paste nerd-font glyphs literally
@@ -72,12 +92,16 @@ digits). It is `opt.foldcolumn = "0"` plus a custom `opt.statuscolumn` built in
   nearest fold-start line whose `foldlevel` equals the cursor's depth — the
   `foldlevel(s) == level` guard is essential, otherwise deeper sibling folds
   sitting above the cursor (but not containing it) get wrongly picked. The walk
-  is bounded by the parent fold (`foldlevel(s-1) < level`).
-- `M.update_active()` caches the result in `M._active = { buf, line }`. A
-  `config_fold` autocmd (`CursorMoved` / `CursorMovedI` / `BufEnter` /
-  `WinEnter`) refreshes the cache; `relativenumber` forces a statuscolumn redraw
-  on every cursor move so the highlighted chevron tracks the cursor.
-- `M.marker()` wraps the active chevron in `%#FoldActive#…%*`. Because of that,
+  is bounded by the parent fold (`foldlevel(s-1) < level`) and reads the cached
+  fold-start set (not `foldexpr`).
+- Two `config_fold` autocmds: one (`BufWinEnter` / `BufReadPost` / `TextChanged`
+  / `InsertLeave` / `CursorHold`) `vim.schedule`s `M.refresh` to repopulate the
+  caches off-redraw — `CursorHold` (after `updatetime`) is what makes a freshly
+  set `ma` appear without a manual redraw; the other (`CursorMoved` /
+  `CursorMovedI` / `BufEnter` / `WinEnter`) runs `M.update_active` and caches the
+  result in `M._active = { buf, line }`. `relativenumber` forces a statuscolumn
+  redraw on every cursor move so the highlighted chevron tracks the cursor.
+- `M.marker()` wraps the active chevron / mark in `%#…#…%*`. Because of that,
   the marker segment in `statuscolumn` uses the `%{%…%}` form (which interprets
   embedded highlight items), while `M.number()` stays in the plain `%{…}` form.
 

@@ -141,6 +141,7 @@ local function consumer_body(annotation, handler)
       "",
       "import akka.javasdk.annotations.Component;",
       "import akka.javasdk.annotations.Consume;",
+      "import akka.javasdk.client.ComponentClient;",
       "import akka.javasdk.consumer.Consumer;",
       "import org.slf4j.Logger;",
       "import org.slf4j.LoggerFactory;",
@@ -150,6 +151,12 @@ local function consumer_body(annotation, handler)
       "public class $TM_FILENAME_BASE extends Consumer {",
       "",
       "  private final Logger logger = LoggerFactory.getLogger(getClass());",
+      "",
+      "  private final ComponentClient componentClient;",
+      "",
+      "  public $TM_FILENAME_BASE(ComponentClient componentClient) {",
+      "    this.componentClient = componentClient;",
+      "  }",
       "",
       "  public Effect " .. m.name .. "(" .. m.type .. " " .. m.param .. ") {",
       '    logger.info("' .. m.log .. ': {}", ' .. m.param .. ");",
@@ -197,9 +204,32 @@ local function kve_body(ctx)
   }, "\n")
 end
 
+-- Builds a command for an entity (Key Value or Event Sourced): a nested command
+-- record plus a handler method stub that logs, leaves a TODO and throws, so the
+-- syntax is identical for both entity kinds. This is a *member* snippet inserted
+-- inside an existing entity class, so it carries no package or imports. The
+-- command name (tabstop 1) is mirrored into the handler parameter type, and the
+-- method name (tabstop 4) into the log line.
+local function command_body(_)
+  return table.concat({
+    "public record ${1:DoSomething}Command(${2:String field}) {}",
+    "",
+    "public Effect<${3:Done}> ${4:doSomething}(${1}Command command) {",
+    '  logger.info("Handling ${4} command");',
+    "  // TODO: implement ${4}",
+    '  throw new UnsupportedOperationException("${4} is not yet implemented");$0',
+    "}",
+  }, "\n")
+end
+
 -- Each spec builds its body from the buffer context. New component snippets are
 -- added here.
 local specs = {
+  {
+    trigger = "akka-command",
+    description = "Akka entity command record and a handler stub (logs, TODO, throws)",
+    body = command_body,
+  },
   {
     trigger = "akka-endpoint",
     description = "Akka HTTP endpoint with ComponentClient and an SLF4J logger",

@@ -110,6 +110,9 @@ material.setup({
     -- Chevron of the innermost fold under the cursor (statuscolumn, see util/fold.lua)
     FoldActive = { fg = material_colors.main.blue, bold = true },
 
+    -- Mark letter in the gutter (statuscolumn, see util/fold.lua)
+    FoldMark = { fg = material_colors.main.purple, bold = true },
+
     -- Virtual "N lines" label on a closed fold (see util/fold.lua)
     FoldCount = { fg = material_colors.main.blue, italic = true },
 

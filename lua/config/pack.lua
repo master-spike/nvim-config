@@ -64,7 +64,6 @@ vim.pack.add({
   { src = "https://github.com/folke/snacks.nvim" },
   { src = "https://github.com/folke/flash.nvim" },
   { src = "https://github.com/norcalli/nvim-colorizer.lua" },
-  { src = "https://github.com/Isrothy/neominimap.nvim" },
   -- Neo-tree
   {
     src = "https://github.com/nvim-neo-tree/neo-tree.nvim",

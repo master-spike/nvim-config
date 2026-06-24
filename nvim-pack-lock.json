@@ -83,10 +83,6 @@
       "src": "https://github.com/nvim-neo-tree/neo-tree.nvim",
       "version": "3.0.0 - 4.0.0"
     },
-    "neominimap.nvim": {
-      "rev": "0676085d898019f06044923934e38663f5efa290",
-      "src": "https://github.com/Isrothy/neominimap.nvim"
-    },
     "nightfox.nvim": {
       "rev": "26b61b1f856ec37cae3cb64f5690adb955f246a1",
       "src": "git@github.com:EdenEast/nightfox.nvim"

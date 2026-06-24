@@ -55,7 +55,9 @@ What each part is for:
   `editor.active` bg / `editor.fg_dark` fg — instead of Material's default
   darker `bg_alt`, plus `FoldActive` — `main.blue` fg, `bold` — used by the
   custom fold gutter in `lua/util/fold.lua` to illuminate the chevron of the
-  innermost fold containing the cursor; and `FoldCount` — `main.blue` fg,
+  innermost fold containing the cursor; `FoldMark` — `main.purple` fg, `bold` —
+  used by the same gutter to render a |mark| letter on its line (a mark takes
+  priority over the fold chevron); and `FoldCount` — `main.blue` fg,
   `italic` — and `FoldLine` — `main.yellow` fg (golden, matching `MatchParen`) —
   used by `M.foldtext()` to render a closed fold as its first line plus a
   `  N lines` label; see `nvim-core-options-keymaps-autocmds`).

@@ -105,8 +105,15 @@ substitution — neither applies VSCode variable *transforms*. Deducing the Java
 - Add new component snippets by appending to the `specs` table; each `body` is a
   function `(ctx) -> string` (ctx = `{ package, class_file }`) that allocates
   tabstops lazily via `new_builder(ctx)`. `consumer_body(annotation, handler)`
-  factors the shared Consumer skeleton.
-- Current triggers: `akka-endpoint`, `akka-key-value-entity`,
+  factors the shared Consumer skeleton, which injects a `ComponentClient` (import
+  + field + constructor) by default.
+- Not every body uses `ctx`: `command_body(_)` is a *member* snippet (a command
+  record + handler stub that logs, leaves a TODO and throws
+  `UnsupportedOperationException`) inserted inside an existing entity class, so it
+  emits no package/imports. It uses mirrored tabstops — `${1}` (command name) is
+  reused in the handler parameter type, `${4}` (method name) in the log line —
+  and is identical for Key Value and Event Sourced entities.
+- Current triggers: `akka-command`, `akka-endpoint`, `akka-key-value-entity`,
   `akka-consumer-event-sourced-entity`, `akka-consumer-key-value-entity`,
   `akka-consumer-workflow`, `akka-consumer-service-stream`,
   `akka-consumer-topic`.
